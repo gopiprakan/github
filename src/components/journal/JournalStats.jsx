@@ -1,7 +1,7 @@
 import React from 'react';
 import { BookOpen, Flame, Sparkles, Plus, Code2 } from 'lucide-react';
 
-export default function JournalStats({ totalEntries, streakDays = 47, onNewEntry }) {
+export default function JournalStats({ totalEntries = 0, streakDays = 0, onNewEntry }) {
   return (
     <div className="rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 shadow-sm mb-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -15,23 +15,23 @@ export default function JournalStats({ totalEntries, streakDays = 47, onNewEntry
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted max-w-xl leading-relaxed">
-            Personal log of daily problem-solving breakthroughs, architectural decisions, and technologies mastered.
+            Record daily problem-solving breakthroughs, architectural decisions, and technologies mastered alongside your GitHub commits.
           </p>
         </div>
 
         {/* Action Button & Metrics */}
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-4 py-1 px-3 rounded-xl bg-gray-50 dark:bg-gh-darkCard border border-gh-lightBorder dark:border-gh-darkBorder text-xs">
+          <div className="flex items-center gap-4 py-1.5 px-3.5 rounded-xl bg-gray-50 dark:bg-gh-darkCard border border-gh-lightBorder dark:border-gh-darkBorder text-xs">
             <div>
               <span className="text-[10px] uppercase font-semibold text-gh-lightMuted dark:text-gh-darkMuted block">Logged Sessions</span>
               <span className="text-sm font-mono font-bold text-gh-lightText dark:text-gh-darkText">{totalEntries}</span>
             </div>
             <div className="w-[1px] h-6 bg-gh-lightBorder dark:border-gh-darkBorder" />
             <div>
-              <span className="text-[10px] uppercase font-semibold text-gh-lightMuted dark:text-gh-darkMuted block">Documented Streak</span>
+              <span className="text-[10px] uppercase font-semibold text-gh-lightMuted dark:text-gh-darkMuted block">Journal Streak</span>
               <span className="text-sm font-mono font-bold text-emerald-500 flex items-center gap-1">
                 <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                {streakDays} Days
+                {streakDays} {streakDays === 1 ? 'Day' : 'Days'}
               </span>
             </div>
           </div>

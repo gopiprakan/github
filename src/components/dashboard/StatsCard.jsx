@@ -1,13 +1,20 @@
 import React from 'react';
-import { Flame, GitCommit, Trophy, CalendarCheck, FolderGit2, TrendingUp } from 'lucide-react';
+import { Flame, GitCommit, Trophy, FolderGit2 } from 'lucide-react';
 
 export default function StatsCard({ profile }) {
+  if (!profile) return null;
+
+  const currentStreak = profile.currentStreak || 0;
+  const longestStreak = profile.longestStreak || 0;
+  const totalCommits = profile.totalCommitsYear || 0;
+  const publicRepos = profile.publicRepos || 0;
+
   const stats = [
     {
       id: 'current-streak',
       label: 'Current Streak',
-      value: `${profile.currentStreak || 47} days`,
-      subtext: 'Active uninterrupted coding',
+      value: `${currentStreak} ${currentStreak === 1 ? 'day' : 'days'}`,
+      subtext: currentStreak > 0 ? 'Active consecutive coding' : 'Push code today to start streak',
       icon: Flame,
       color: 'text-amber-500',
       bgColor: 'bg-amber-500/10',
@@ -16,9 +23,9 @@ export default function StatsCard({ profile }) {
     },
     {
       id: 'total-commits',
-      label: 'Commits in Past Year',
-      value: (profile.totalCommitsYear || 1482).toLocaleString(),
-      subtext: 'Across all tracked repositories',
+      label: 'Tracked Activity',
+      value: totalCommits.toLocaleString(),
+      subtext: 'Events & commits recorded',
       icon: GitCommit,
       color: 'text-emerald-500',
       bgColor: 'bg-emerald-500/10',
@@ -27,8 +34,8 @@ export default function StatsCard({ profile }) {
     {
       id: 'longest-streak',
       label: 'Longest Streak',
-      value: `${profile.longestStreak || 94} days`,
-      subtext: 'All-time personal record',
+      value: `${longestStreak} ${longestStreak === 1 ? 'day' : 'days'}`,
+      subtext: 'All-time tracked record',
       icon: Trophy,
       color: 'text-purple-500',
       bgColor: 'bg-purple-500/10',
@@ -37,8 +44,8 @@ export default function StatsCard({ profile }) {
     {
       id: 'public-repos',
       label: 'Public Repositories',
-      value: profile.publicRepos || 24,
-      subtext: `${profile.publicGists || 9} gists & tools open sourced`,
+      value: publicRepos,
+      subtext: `${profile.publicGists || 0} gists & public projects`,
       icon: FolderGit2,
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
