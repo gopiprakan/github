@@ -45,7 +45,7 @@ export default function JournalPage() {
       {/* Journal Header & Stats */}
       <JournalStats
         totalEntries={entries.length}
-        streakDays={47}
+        streakDays={entries.length}
         onNewEntry={handleOpenAdd}
       />
 
