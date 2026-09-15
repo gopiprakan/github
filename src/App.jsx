@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { JournalProvider } from './context/JournalContext';
@@ -42,6 +43,9 @@ function MainApp() {
 
       {/* Owner GitHub Authentication & Switch Modal */}
       <ConnectGitHubModal />
+
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
     </div>
   );
 }
