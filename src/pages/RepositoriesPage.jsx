@@ -1,27 +1,56 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, ArrowUpDown, BookMarked, ExternalLink, Star, GitFork, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search, Filter, ArrowUpDown, BookMarked, ExternalLink, Star, GitFork, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
 import RepositoryCard from '../components/dashboard/RepositoryCard';
 import RepositoryModal from '../components/dashboard/RepositoryModal';
-import { SAMPLE_REPOSITORIES } from '../services/mockData';
+import Skeleton from '../components/common/Skeleton';
 import { useAuth } from '../context/AuthContext';
+import { fetchUserRepositories } from '../services/githubApi';
 
 export default function RepositoriesPage() {
-  const { monitoredUsername, isDemoMode } = useAuth();
+  const { monitoredUsername, ownerToken, switchMonitoredUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [repositories, setRepositories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('All');
-  const [sortBy, setSortBy] = useState('stars'); // 'stars' | 'updated' | 'name'
+  const [sortBy, setSortBy] = useState('updated'); // 'stars' | 'updated' | 'name'
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newHandle, setNewHandle] = useState('');
 
-  // Extract unique languages
+  const loadRepos = async (user) => {
+    if (!user || !user.trim()) {
+      setRepositories([]);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetchUserRepositories(user, ownerToken);
+      setRepositories(res.data || []);
+    } catch (err) {
+      console.error('Failed to load repositories:', err);
+      setRepositories([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (monitoredUsername) {
+      loadRepos(monitoredUsername);
+    } else {
+      setRepositories([]);
+    }
+  }, [monitoredUsername, ownerToken]);
+
+  // Extract unique languages from the user's real repos
   const languages = useMemo(() => {
-    const list = ['All', ...new Set(SAMPLE_REPOSITORIES.map(r => r.language).filter(Boolean))];
+    const list = ['All', ...new Set(repositories.map(r => r.language).filter(Boolean))];
     return list;
-  }, []);
+  }, [repositories]);
 
   // Filter and sort
   const filteredRepos = useMemo(() => {
-    let result = SAMPLE_REPOSITORIES.filter(repo => {
+    let result = repositories.filter(repo => {
       const matchesLang = selectedLanguage === 'All' || repo.language === selectedLanguage;
       const q = searchQuery.toLowerCase().trim();
       const matchesQuery = !q ||
@@ -37,12 +66,49 @@ export default function RepositoriesPage() {
       if (sortBy === 'name') return a.name.localeCompare(b.name);
       return 0;
     });
-  }, [searchQuery, selectedLanguage, sortBy]);
+  }, [repositories, searchQuery, selectedLanguage, sortBy]);
 
   const handleSelectRepo = (repo) => {
     setSelectedRepo(repo);
     setIsModalOpen(true);
   };
+
+  const handleUserSubmit = (e) => {
+    e.preventDefault();
+    if (newHandle.trim()) {
+      switchMonitoredUser(newHandle.trim());
+      setNewHandle('');
+    }
+  };
+
+  if (!monitoredUsername) {
+    return (
+      <div className="py-12 max-w-xl mx-auto px-4 text-center">
+        <div className="rounded-3xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-8 shadow-sm space-y-4">
+          <BookMarked className="w-12 h-12 text-emerald-500 mx-auto" />
+          <h3 className="text-xl font-bold text-gh-lightText dark:text-gh-darkText">Explore Repositories</h3>
+          <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+            Enter any GitHub username to view all their public repositories and source code stats.
+          </p>
+          <form onSubmit={handleUserSubmit} className="flex gap-2 max-w-sm mx-auto">
+            <input
+              type="text"
+              placeholder="e.g. gopiprakan"
+              value={newHandle}
+              onChange={(e) => setNewHandle(e.target.value)}
+              className="flex-1 px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              Load
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -55,23 +121,32 @@ export default function RepositoriesPage() {
                 <BookMarked className="w-5 h-5" />
               </span>
               <h2 className="text-xl font-bold text-gh-lightText dark:text-gh-darkText">
-                Monitored Repositories
+                Repositories ({repositories.length})
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-              Open source tools, distributed systems, and production services maintained by <span className="font-mono text-emerald-500 font-medium">@{monitoredUsername}</span>.
+              Public open source repositories maintained by <span className="font-mono text-emerald-500 font-medium">@{monitoredUsername}</span>.
             </p>
           </div>
 
-          <a
-            href={`https://github.com/${monitoredUsername}?tab=repositories`}
-            target="_blank"
-            rel="noreferrer"
-            className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-colors flex items-center justify-center gap-1.5 self-start sm:self-auto"
-          >
-            <span>View on GitHub</span>
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => loadRepos(monitoredUsername)}
+              title="Refresh repositories"
+              className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText flex items-center gap-1.5"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Refresh
+            </button>
+            <a
+              href={`https://github.com/${monitoredUsername}?tab=repositories`}
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-colors flex items-center justify-center gap-1.5"
+            >
+              <span>View on GitHub</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
         </div>
       </div>
 
@@ -113,8 +188,8 @@ export default function RepositoriesPage() {
               onChange={(e) => setSortBy(e.target.value)}
               className="px-2.5 py-1.5 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
-              <option value="stars">Most Stars</option>
               <option value="updated">Recently Updated</option>
+              <option value="stars">Most Stars</option>
               <option value="name">Name (A-Z)</option>
             </select>
           </div>
@@ -122,14 +197,20 @@ export default function RepositoriesPage() {
       </div>
 
       {/* Repositories Grid */}
-      {filteredRepos.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Skeleton className="h-44 rounded-2xl" count={6} />
+        </div>
+      ) : filteredRepos.length === 0 ? (
         <div className="p-12 text-center rounded-2xl border border-dashed border-gh-lightBorder dark:border-gh-darkBorder bg-white/50 dark:bg-gh-darkPanel/50">
           <BookMarked className="w-10 h-10 text-gh-lightMuted dark:text-gh-darkMuted mx-auto mb-3 opacity-60" />
           <h4 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText mb-1">
             No Repositories Found
           </h4>
           <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted">
-            Try adjusting your search criteria or language filter.
+            {searchQuery || selectedLanguage !== 'All' 
+              ? 'Try adjusting your search criteria or language filter.' 
+              : `No public repositories found for @${monitoredUsername}.`}
           </p>
         </div>
       ) : (
