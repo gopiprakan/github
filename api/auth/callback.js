@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   }
 
   if (!clientId || !clientSecret) {
-    return res.redirect(302, `${appUrl}/?auth=success&username=alexrivera-dev&demo=true`);
+    return res.redirect(302, `${appUrl}/?auth=error&message=GitHub+OAuth+not+configured`);
   }
 
   try {

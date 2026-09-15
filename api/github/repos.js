@@ -1,7 +1,11 @@
 // Vercel Serverless Function: GitHub Repositories Proxy
 export default async function handler(req, res) {
   const { username } = req.query;
-  const targetUser = username || process.env.VITE_DEFAULT_GITHUB_USERNAME || 'alexrivera-dev';
+  const targetUser = username || process.env.VITE_DEFAULT_GITHUB_USERNAME;
+  if (!targetUser) {
+    return res.status(400).json({ error: 'Username parameter is required.' });
+  }
+
   const pat = process.env.GITHUB_PAT;
 
   const headers = {
@@ -14,7 +18,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=30`, { headers });
+    const response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
     if (!response.ok) {
       return res.status(response.status).json({
         error: `GitHub returned status ${response.status}`,

@@ -38,7 +38,6 @@ app.get('/api/auth/github', (req, res) => {
     return res.json({
       message: 'GitHub OAuth Client ID is not configured.',
       instructions: 'Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in .env file.',
-      demoModeActive: true,
     });
   }
 
@@ -59,7 +58,7 @@ app.get('/api/auth/callback', async (req, res) => {
   }
 
   if (!clientId || !clientSecret) {
-    return res.redirect(`${appUrl}/dashboard?auth=success&username=alexrivera-dev&demo=true`);
+    return res.redirect(`${appUrl}/?auth=error&message=OAuth+not+configured`);
   }
 
   try {
@@ -92,7 +91,7 @@ app.get('/api/auth/callback', async (req, res) => {
     const userData = await userRes.json();
     const username = userData.login || 'developer';
 
-    return res.redirect(`${appUrl}/dashboard?auth=success&token=${accessToken}&username=${username}`);
+    return res.redirect(`${appUrl}/?auth=success&token=${accessToken}&username=${username}`);
   } catch (error) {
     console.error('OAuth callback error:', error);
     return res.redirect(`${appUrl}/?auth=error&message=Server+error+during+OAuth`);
@@ -102,7 +101,11 @@ app.get('/api/auth/callback', async (req, res) => {
 // User endpoint proxy
 app.get('/api/github/user', async (req, res) => {
   const { username } = req.query;
-  const targetUser = username || process.env.VITE_DEFAULT_GITHUB_USERNAME || 'alexrivera-dev';
+  const targetUser = username || process.env.VITE_DEFAULT_GITHUB_USERNAME;
+  if (!targetUser) {
+    return res.status(400).json({ error: 'Username parameter is required.' });
+  }
+
   const pat = process.env.GITHUB_PAT;
 
   const headers = {
@@ -123,7 +126,11 @@ app.get('/api/github/user', async (req, res) => {
 // Repositories endpoint proxy
 app.get('/api/github/repos', async (req, res) => {
   const { username } = req.query;
-  const targetUser = username || process.env.VITE_DEFAULT_GITHUB_USERNAME || 'alexrivera-dev';
+  const targetUser = username || process.env.VITE_DEFAULT_GITHUB_USERNAME;
+  if (!targetUser) {
+    return res.status(400).json({ error: 'Username parameter is required.' });
+  }
+
   const pat = process.env.GITHUB_PAT;
 
   const headers = {
@@ -133,7 +140,7 @@ app.get('/api/github/repos', async (req, res) => {
   if (pat) headers.Authorization = `token ${pat}`;
 
   try {
-    const response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=30`, { headers });
+    const response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
