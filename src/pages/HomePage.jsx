@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Flame,
   ArrowRight,
@@ -13,17 +13,32 @@ import {
   Sparkles,
   BarChart2,
   CheckCircle2,
+  Search,
 } from 'lucide-react';
 import Badge from '../components/common/Badge';
 import { useAuth } from '../context/AuthContext';
 
 export default function HomePage({ onNavigate }) {
-  const { setIsAuthModalOpen, monitoredUsername, isAuthenticated } = useAuth();
+  const { setIsAuthModalOpen, monitoredUsername, switchMonitoredUser, isAuthenticated } = useAuth();
+  const [handleInput, setHandleInput] = useState('');
+
+  const handleMonitorSubmit = (e) => {
+    e.preventDefault();
+    if (handleInput.trim()) {
+      switchMonitoredUser(handleInput.trim());
+      onNavigate('dashboard');
+    } else if (monitoredUsername) {
+      onNavigate('dashboard');
+    }
+  };
+
+  const handleQuickPreset = (username) => {
+    switchMonitoredUser(username);
+    onNavigate('dashboard');
+  };
 
   const previewHeatmapCells = Array.from({ length: 42 }, (_, i) => {
-    // Generate realistic pattern for mini preview
-    const val = (i % 7 === 0 || i % 5 === 2) ? 3 : (i % 3 === 0 ? 2 : (i % 2 === 0 ? 1 : 0));
-    return val;
+    return (i % 7 === 0 || i % 5 === 2) ? 3 : (i % 3 === 0 ? 2 : (i % 2 === 0 ? 1 : 0));
   });
 
   const getCellBg = (lvl) => {
@@ -34,140 +49,106 @@ export default function HomePage({ onNavigate }) {
   };
 
   return (
-    <div className="space-y-24 py-6">
+    <div className="space-y-20 py-6">
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-8 pb-12 sm:pt-16 sm:pb-20">
+      <section className="relative overflow-hidden pt-8 pb-10 sm:pt-16 sm:pb-16">
         <div className="text-center max-w-3xl mx-auto px-4 sm:px-6">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 mb-6 animate-fade-in">
-            <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-            <span>Developer Consistency Engine</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 mb-6">
+            <Flame className="w-4 h-4 fill-amber-500 text-amber-500" />
+            <span>GitHub Activity & Streak Monitor</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span className="font-mono">47 Days Active</span>
+            <span className="font-mono">Live REST API</span>
           </div>
 
           {/* Heading */}
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-gh-lightText dark:text-gh-darkText leading-[1.15] mb-6">
             Code every day. <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400">
-              Track your progress.
+              Track your real progress.
             </span> <br />
-            Build your future.
+            Showcase your work.
           </h1>
 
-          {/* Tagline / Description */}
-          <p className="text-base sm:text-lg text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed max-w-2xl mx-auto mb-10">
-            A developer dashboard that monitors your personal GitHub account. Connect once with OAuth, and let recruiters, peers, and visitors explore your coding streak, commit activity, and technical journal without logging in.
+          {/* Tagline */}
+          <p className="text-base sm:text-lg text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed max-w-2xl mx-auto mb-8">
+            Enter your GitHub username to automatically visualize your public repositories, recent commit streams, language distributions, and daily engineering journal.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <button
-              onClick={() => onNavigate('dashboard')}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all hover:scale-[1.02]"
-            >
-              <span>Explore My Coding Journey</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+          {/* Interactive Username Search Form */}
+          <form onSubmit={handleMonitorSubmit} className="max-w-md mx-auto mb-6">
+            <div className="flex items-center gap-2 p-1.5 rounded-2xl border-2 border-emerald-500/40 bg-white dark:bg-gh-darkPanel shadow-lg focus-within:border-emerald-500 transition-all">
+              <div className="flex items-center pl-3 text-gh-lightMuted dark:text-gh-darkMuted text-sm font-mono">
+                @
+              </div>
+              <input
+                type="text"
+                value={handleInput}
+                onChange={(e) => setHandleInput(e.target.value)}
+                placeholder={monitoredUsername || "Enter your GitHub username"}
+                className="flex-1 px-2 py-2 text-sm bg-transparent text-gh-lightText dark:text-gh-darkText placeholder:text-gh-lightMuted focus:outline-none font-medium"
+              />
+              <button
+                type="submit"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center gap-1.5 shadow-sm transition-all whitespace-nowrap"
+              >
+                <span>Track User</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </form>
+
+          {/* Quick options */}
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-gh-lightMuted dark:text-gh-darkMuted mb-8">
+            <span>Popular examples:</span>
+            {['torvalds', 'gaearon', 'yyx990803'].map((ex) => (
+              <button
+                key={ex}
+                type="button"
+                onClick={() => handleQuickPreset(ex)}
+                className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gh-darkCard hover:text-emerald-500 transition-colors font-mono"
+              >
+                @{ex}
+              </button>
+            ))}
+          </div>
+
+          {/* Connect GitHub Alternative */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            {monitoredUsername && (
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
+              >
+                <span>View Dashboard (@{monitoredUsername})</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
 
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition-all"
             >
               <Github className="w-4 h-4" />
-              <span>{isAuthenticated ? `Connected as @${monitoredUsername}` : 'Connect GitHub'}</span>
+              <span>{isAuthenticated ? `Connected as @${monitoredUsername}` : 'Connect GitHub Account'}</span>
             </button>
           </div>
 
-          {/* Quick trust reassurance */}
           <p className="text-[11px] text-gh-lightMuted dark:text-gh-darkMuted mt-4 flex items-center justify-center gap-1.5 font-mono">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            Public visitors browse read-only. Zero login requirements for guests.
+            Zero login required to monitor any public GitHub profile.
           </p>
-        </div>
-
-        {/* Interactive Dashboard Preview Card */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 mt-16">
-          <div className="rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 shadow-elevated dark:shadow-elevated-dark overflow-hidden relative">
-            {/* Header bar */}
-            <div className="flex items-center justify-between pb-4 border-b border-gh-lightBorder dark:border-gh-darkBorder mb-6">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-400"></span>
-                <span className="w-3 h-3 rounded-full bg-amber-400"></span>
-                <span className="w-3 h-3 rounded-full bg-emerald-400"></span>
-                <span className="ml-2 text-xs font-mono text-gh-lightMuted dark:text-gh-darkMuted">
-                  commitstreak.app/@{monitoredUsername}
-                </span>
-              </div>
-              <Badge variant="emerald" size="xs">Live Preview</Badge>
-            </div>
-
-            {/* Dashboard snapshot */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Snapshot Col 1: Streak Card */}
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gh-darkCard/50 border border-gh-lightBorder dark:border-gh-darkBorder">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gh-lightMuted dark:text-gh-darkMuted font-medium">Consecutive Streak</span>
-                  <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-                </div>
-                <p className="text-3xl font-mono font-bold text-gh-lightText dark:text-gh-darkText mb-1">47 Days</p>
-                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">Top 2% of GitHub contributors</p>
-              </div>
-
-              {/* Snapshot Col 2: Heatmap grid teaser */}
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gh-darkCard/50 border border-gh-lightBorder dark:border-gh-darkBorder md:col-span-2">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gh-lightMuted dark:text-gh-darkMuted font-medium">Recent Contribution Velocity</span>
-                  <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400">1,482 commits / yr</span>
-                </div>
-                {/* Mini Heatmap */}
-                <div className="flex gap-1 overflow-x-auto py-1">
-                  {Array.from({ length: 14 }).map((_, col) => (
-                    <div key={col} className="flex flex-col gap-1">
-                      {Array.from({ length: 3 }).map((_, row) => {
-                        const cellLvl = (col * 3 + row) % 4;
-                        return (
-                          <div
-                            key={row}
-                            className={`w-3 h-3 rounded-[2px] ${getCellBg(cellLvl)}`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-gh-lightMuted dark:text-gh-darkMuted">
-                  <span>July</span>
-                  <span>August</span>
-                  <span>September</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom banner in preview card */}
-            <div className="mt-6 pt-4 border-t border-gh-lightBorder dark:border-gh-darkBorder flex items-center justify-between text-xs">
-              <span className="text-gh-lightMuted dark:text-gh-darkMuted">
-                Latest commit: <code className="font-mono text-emerald-500">8f42d1b</code> in <span className="font-semibold text-gh-lightText dark:text-gh-darkText">micro-cache-rs</span>
-              </span>
-              <button
-                onClick={() => onNavigate('dashboard')}
-                className="text-emerald-600 dark:text-emerald-400 hover:underline font-medium flex items-center gap-1"
-              >
-                Open Full Analytics <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Features Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-2xl mx-auto mb-14">
           <h2 className="text-2xl sm:text-3xl font-bold text-gh-lightText dark:text-gh-darkText mb-3">
-            Designed for Developers Who Value Consistency
+            Live GitHub Visibility
           </h2>
           <p className="text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-            Everything you need to showcase genuine dedication, track learning velocity, and present proof of work.
+            Real-time GitHub metrics computed straight from the public REST API.
           </p>
         </div>
 
@@ -178,10 +159,10 @@ export default function HomePage({ onNavigate }) {
               <Flame className="w-5 h-5 fill-emerald-500" />
             </div>
             <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText mb-2">
-              Uninterrupted Streak Tracker
+              Real-time Streak Tracking
             </h3>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-              Real-time calculations for current streaks, historical records, and active days across every public repository you contribute to.
+              Calculates consecutive coding streaks and active days directly from your actual GitHub push events and repository updates.
             </p>
           </div>
 
@@ -194,7 +175,7 @@ export default function HomePage({ onNavigate }) {
               Daily Coding Journal
             </h3>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-              Document problems solved, architectures investigated, and lessons learned alongside your commit messages.
+              Log breakthroughs, problems solved, and architecture decisions mapped alongside your git commit logs.
             </p>
           </div>
 
@@ -204,10 +185,10 @@ export default function HomePage({ onNavigate }) {
               <BarChart2 className="w-5 h-5" />
             </div>
             <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText mb-2">
-              GitHub Visual Analytics
+              Language & Activity Analytics
             </h3>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-              Rich 52-week contribution heatmap, language distribution bars, and weekly cadence charts powered by Recharts.
+              Visualizes language breakdown from your actual repositories, alongside 52-week activity distribution and weekly cadence.
             </p>
           </div>
         </div>
@@ -218,47 +199,37 @@ export default function HomePage({ onNavigate }) {
         <div className="p-8 sm:p-12 rounded-3xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard/40">
           <div className="text-center max-w-xl mx-auto mb-10">
             <h2 className="text-2xl font-bold text-gh-lightText dark:text-gh-darkText mb-2">
-              How CommitStreak Works
+              How It Works
             </h2>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted">
-              Simple 3-step lifecycle for continuous personal engineering oversight.
+              Instantly monitor any user's real GitHub presence in seconds.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
             <div className="p-5 rounded-2xl bg-white dark:bg-gh-darkPanel border border-gh-lightBorder dark:border-gh-darkBorder text-center">
               <span className="w-7 h-7 rounded-full bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center mx-auto mb-3">1</span>
-              <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">Connect Once</h4>
+              <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">Enter Username</h4>
               <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-                Authorize your GitHub account once. Tokens remain securely processed on serverless endpoints.
+                Provide your GitHub handle or authenticate once with OAuth.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-white dark:bg-gh-darkPanel border border-gh-lightBorder dark:border-gh-darkBorder text-center">
               <span className="w-7 h-7 rounded-full bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center mx-auto mb-3">2</span>
-              <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">Commit Everyday</h4>
+              <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">Fetch Live Data</h4>
               <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-                Work on your side projects and open source repos. CommitStreak detects push events automatically.
+                Real repositories, commit streams, and languages are pulled directly from GitHub.
               </p>
             </div>
 
             <div className="p-5 rounded-2xl bg-white dark:bg-gh-darkPanel border border-gh-lightBorder dark:border-gh-darkBorder text-center">
               <span className="w-7 h-7 rounded-full bg-emerald-500 text-white font-mono text-xs font-bold flex items-center justify-center mx-auto mb-3">3</span>
-              <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">Share Publicly</h4>
+              <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">Share & Journal</h4>
               <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-                Send your link to mentors or hiring managers. They view your work instantly without logging in.
+                Maintain your streak, log daily progress, and share your dashboard with recruiters or peers.
               </p>
             </div>
-          </div>
-
-          {/* Bottom call to action */}
-          <div className="mt-10 text-center">
-            <button
-              onClick={() => onNavigate('dashboard')}
-              className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs inline-flex items-center gap-2 shadow-sm transition-all"
-            >
-              Launch Dashboard Now <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       </section>
