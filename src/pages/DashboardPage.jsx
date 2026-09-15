@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, RefreshCw, AlertCircle, GitFork, BookOpen } from 'lucide-react';
+import { ArrowRight, Sparkles, RefreshCw, AlertCircle, GitFork, BookOpen, Search, Github, ShieldCheck, Flame } from 'lucide-react';
 import ProfileCard from '../components/dashboard/ProfileCard';
 import StatsCard from '../components/dashboard/StatsCard';
 import ContributionCalendar from '../components/dashboard/ContributionCalendar';
@@ -15,72 +15,161 @@ import {
   fetchUserProfile,
   fetchUserRepositories,
   fetchRecentEvents,
-  SAMPLE_CONTRIBUTIONS,
-  SAMPLE_WEEKLY_ACTIVITY,
-  SAMPLE_MONTHLY_ACTIVITY,
-  SAMPLE_LANGUAGES,
+  calculateLanguageBreakdown,
+  calculateActivityAndContributions,
 } from '../services/githubApi';
 
 export default function DashboardPage({ onNavigate }) {
-  const { monitoredUsername, isDemoMode, ownerToken, setIsAuthModalOpen } = useAuth();
+  const { monitoredUsername, ownerToken, setIsAuthModalOpen, switchMonitoredUser } = useAuth();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [reposData, setReposData] = useState([]);
   const [commitsData, setCommitsData] = useState([]);
-  const [isLiveProfile, setIsLiveProfile] = useState(false);
+  const [languagesData, setLanguagesData] = useState([]);
+  const [activityMetrics, setActivityMetrics] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
+
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [isRepoModalOpen, setIsRepoModalOpen] = useState(false);
+  const [searchHandle, setSearchHandle] = useState('');
 
-  useEffect(() => {
-    let isMounted = true;
-    async function loadData() {
-      setLoading(true);
-      try {
-        if (isDemoMode) {
-          const userRes = await fetchUserProfile(null);
-          const reposRes = await fetchUserRepositories(null);
-          const commitsRes = await fetchRecentEvents(null);
-          if (isMounted) {
-            setProfileData(userRes.data);
-            setReposData(reposRes.data);
-            setCommitsData(commitsRes.data);
-            setIsLiveProfile(false);
-          }
-        } else {
-          const [userRes, reposRes, commitsRes] = await Promise.all([
-            fetchUserProfile(monitoredUsername, ownerToken),
-            fetchUserRepositories(monitoredUsername, ownerToken),
-            fetchRecentEvents(monitoredUsername, ownerToken),
-          ]);
-          if (isMounted) {
-            setProfileData(userRes.data);
-            setReposData(reposRes.data);
-            setCommitsData(commitsRes.data);
-            setIsLiveProfile(userRes.isLive);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to load dashboard data:', err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+  const loadData = async (userToLoad) => {
+    if (!userToLoad || !userToLoad.trim()) {
+      setProfileData(null);
+      setReposData([]);
+      setCommitsData([]);
+      setLanguagesData([]);
+      setActivityMetrics(null);
+      setFetchError(null);
+      return;
     }
 
-    loadData();
-    return () => {
-      isMounted = false;
-    };
-  }, [monitoredUsername, isDemoMode, ownerToken]);
+    setLoading(true);
+    setFetchError(null);
+
+    try {
+      const [userRes, reposRes, eventsRes] = await Promise.all([
+        fetchUserProfile(userToLoad, ownerToken),
+        fetchUserRepositories(userToLoad, ownerToken),
+        fetchRecentEvents(userToLoad, ownerToken),
+      ]);
+
+      if (!userRes.data) {
+        setFetchError(userRes.error || `Could not find GitHub user "@${userToLoad}". Please verify the username.`);
+        setProfileData(null);
+        setReposData([]);
+        setCommitsData([]);
+        return;
+      }
+
+      const repos = reposRes.data || [];
+      const commits = eventsRes.data || [];
+      const languages = calculateLanguageBreakdown(repos);
+      const metrics = calculateActivityAndContributions(commits, repos);
+
+      const enrichedProfile = {
+        ...userRes.data,
+        currentStreak: metrics.currentStreak,
+        longestStreak: metrics.longestStreak,
+        totalCommitsYear: metrics.totalCommitsYear,
+      };
+
+      setProfileData(enrichedProfile);
+      setReposData(repos);
+      setCommitsData(commits);
+      setLanguagesData(languages);
+      setActivityMetrics(metrics);
+    } catch (err) {
+      console.error('Failed to load GitHub dashboard data:', err);
+      setFetchError(err.message || 'An error occurred while fetching GitHub data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (monitoredUsername) {
+      loadData(monitoredUsername);
+    } else {
+      setProfileData(null);
+    }
+  }, [monitoredUsername, ownerToken]);
 
   const handleSelectRepo = (repo) => {
     setSelectedRepo(repo);
     setIsRepoModalOpen(true);
   };
 
-  if (loading || !profileData) {
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchHandle.trim()) {
+      switchMonitoredUser(searchHandle.trim());
+      setSearchHandle('');
+    }
+  };
+
+  // State 1: No user configured yet (New User Welcome State)
+  if (!monitoredUsername && !loading) {
+    return (
+      <div className="py-12 max-w-3xl mx-auto px-4 sm:px-6">
+        <div className="rounded-3xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-8 sm:p-12 shadow-elevated dark:shadow-elevated-dark text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+            <Github className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gh-lightText dark:text-gh-darkText">
+              Enter GitHub Account to Monitor
+            </h2>
+            <p className="text-sm text-gh-lightMuted dark:text-gh-darkMuted max-w-lg mx-auto">
+              Please enter your GitHub username or connect your GitHub account to see live repositories, recent commit streams, streaks, and analytics.
+            </p>
+          </div>
+
+          {/* Input Form */}
+          <form onSubmit={handleSearchSubmit} className="max-w-md mx-auto">
+            <div className="flex items-center gap-2 p-1.5 rounded-2xl border-2 border-emerald-500/50 bg-gh-lightBg dark:bg-gh-darkCard focus-within:border-emerald-500 transition-all">
+              <span className="pl-3 text-gh-lightMuted dark:text-gh-darkMuted font-mono text-sm">@</span>
+              <input
+                type="text"
+                value={searchHandle}
+                onChange={(e) => setSearchHandle(e.target.value)}
+                placeholder="e.g. gopiprakan, torvalds, etc."
+                className="flex-1 px-2 py-2 text-sm bg-transparent text-gh-lightText dark:text-gh-darkText placeholder:text-gh-lightMuted focus:outline-none font-medium"
+              />
+              <button
+                type="submit"
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center gap-1.5 transition-all"
+              >
+                <span>Load Profile</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </form>
+
+          <div className="pt-4 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+            >
+              <Github className="w-4 h-4" />
+              <span>Connect with GitHub OAuth</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // State 2: Loading State
+  if (loading) {
     return (
       <div className="space-y-6 py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-8 w-48 rounded-xl" />
+          <Skeleton className="h-8 w-32 rounded-xl" />
+        </div>
         <Skeleton className="h-40 w-full rounded-2xl" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Skeleton className="h-28 rounded-2xl" count={4} />
@@ -94,30 +183,67 @@ export default function DashboardPage({ onNavigate }) {
     );
   }
 
+  // State 3: Error State (e.g. User not found)
+  if (fetchError || !profileData) {
+    return (
+      <div className="py-12 max-w-xl mx-auto px-4">
+        <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-6 text-center space-y-4">
+          <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
+          <h3 className="text-lg font-bold text-red-700 dark:text-red-400">User Profile Not Found</h3>
+          <p className="text-xs text-red-600 dark:text-red-300">
+            {fetchError || `Could not find any public GitHub user named "${monitoredUsername}".`}
+          </p>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className="px-4 py-2 text-xs font-medium rounded-xl bg-red-600 hover:bg-red-700 text-white"
+            >
+              Enter Another Username
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // State 4: Active Dashboard View with Real Data
   return (
     <div className="space-y-6 py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Notice Banner if Demo Mode */}
-      {isDemoMode && (
-        <div className="p-3 sm:p-4 rounded-2xl border border-emerald-300 dark:border-emerald-800/60 bg-emerald-50/50 dark:bg-emerald-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300">
-            <Sparkles className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-            <span>
-              <strong>Sample Demo Mode Active:</strong> Displaying realistic data for <span className="font-mono font-semibold">@{profileData.username}</span> to showcase complete streak & calendar metrics.
-            </span>
-          </div>
+      {/* Top search & switch user bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm">
+        <div className="flex items-center gap-2 text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>
+            Active live monitor: <strong className="text-gh-lightText dark:text-gh-darkText font-mono">@{profileData.username}</strong>
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <form onSubmit={handleSearchSubmit} className="flex-1 sm:w-64 relative">
+            <input
+              type="text"
+              placeholder="Switch GitHub user..."
+              value={searchHandle}
+              onChange={(e) => setSearchHandle(e.target.value)}
+              className="w-full pl-7 pr-3 py-1.5 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+            />
+            <Search className="w-3.5 h-3.5 text-gh-lightMuted absolute left-2.5 top-2.5 pointer-events-none" />
+          </form>
+
           <button
-            onClick={() => setIsAuthModalOpen(true)}
-            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs whitespace-nowrap shadow-sm transition-colors"
+            onClick={() => loadData(monitoredUsername)}
+            title="Refresh GitHub data"
+            className="p-1.5 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightMuted dark:text-gh-darkMuted hover:text-emerald-500 transition-colors"
           >
-            Monitor Your Own Account
+            <RefreshCw className="w-4 h-4" />
           </button>
         </div>
-      )}
+      </div>
 
       {/* Profile Overview Card */}
       <ProfileCard
         profile={profileData}
-        isLive={isLiveProfile}
+        isLive={true}
         onConnectClick={() => setIsAuthModalOpen(true)}
       />
 
@@ -125,18 +251,22 @@ export default function DashboardPage({ onNavigate }) {
       <StatsCard profile={profileData} />
 
       {/* 52-Week Contributions Calendar */}
-      <ContributionCalendar contributions={SAMPLE_CONTRIBUTIONS} />
+      {activityMetrics && (
+        <ContributionCalendar contributions={activityMetrics.contributions} />
+      )}
 
       {/* Analytics Charts & Language Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <CommitActivityChart
-            weeklyData={SAMPLE_WEEKLY_ACTIVITY}
-            monthlyData={SAMPLE_MONTHLY_ACTIVITY}
-          />
+          {activityMetrics && (
+            <CommitActivityChart
+              weeklyData={activityMetrics.weeklyCadence}
+              monthlyData={activityMetrics.monthlyActivity}
+            />
+          )}
         </div>
         <div>
-          <LanguageBreakdown languages={SAMPLE_LANGUAGES} />
+          <LanguageBreakdown languages={languagesData} />
         </div>
       </div>
 
@@ -146,25 +276,31 @@ export default function DashboardPage({ onNavigate }) {
           <div className="flex items-center justify-between">
             <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
               <GitFork className="w-4 h-4 text-emerald-500" />
-              Featured Repositories
+              Public Repositories ({reposData.length})
             </h3>
             <button
               onClick={() => onNavigate('repositories')}
               className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
             >
-              View all {reposData.length} repos <ArrowRight className="w-3 h-3" />
+              View all repos <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {reposData.slice(0, 4).map((repo) => (
-              <RepositoryCard
-                key={repo.id}
-                repo={repo}
-                onSelect={handleSelectRepo}
-              />
-            ))}
-          </div>
+          {reposData.length === 0 ? (
+            <div className="p-8 rounded-2xl border border-dashed border-gh-lightBorder dark:border-gh-darkBorder text-center text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+              No public repositories found for @{profileData.username}.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {reposData.slice(0, 4).map((repo) => (
+                <RepositoryCard
+                  key={repo.id}
+                  repo={repo}
+                  onSelect={handleSelectRepo}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Live Commits Column */}
