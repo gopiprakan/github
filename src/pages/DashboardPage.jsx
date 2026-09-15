@@ -183,22 +183,50 @@ export default function DashboardPage({ onNavigate }) {
     );
   }
 
-  // State 3: Error State (e.g. User not found)
+  // State 3: Error State (e.g. User not found, rate limit, etc.)
   if (fetchError || !profileData) {
+    const isNotFound = fetchError && fetchError.toLowerCase().includes('not found');
+    const isRateLimit = fetchError && fetchError.toLowerCase().includes('rate limit');
+
     return (
       <div className="py-12 max-w-xl mx-auto px-4">
-        <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-6 text-center space-y-4">
+        <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-6 sm:p-8 text-center space-y-4 shadow-sm">
           <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
-          <h3 className="text-lg font-bold text-red-700 dark:text-red-400">User Profile Not Found</h3>
-          <p className="text-xs text-red-600 dark:text-red-300">
+          <h3 className="text-lg font-bold text-red-700 dark:text-red-400">
+            {isNotFound ? 'User Profile Not Found' : isRateLimit ? 'GitHub API Rate Limit Reached' : 'Unable to Load Profile'}
+          </h3>
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-300 max-w-md mx-auto">
             {fetchError || `Could not find any public GitHub user named "${monitoredUsername}".`}
           </p>
-          <div className="flex items-center justify-center gap-2 pt-2">
+
+          <form onSubmit={handleSearchSubmit} className="max-w-xs mx-auto pt-2 flex gap-2">
+            <input
+              type="text"
+              placeholder="Enter GitHub username..."
+              value={searchHandle}
+              onChange={(e) => setSearchHandle(e.target.value)}
+              className="flex-1 px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+            >
+              Search
+            </button>
+          </form>
+
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={() => loadData(monitoredUsername)}
+              className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkPanel flex items-center gap-1.5 transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Retry
+            </button>
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-4 py-2 text-xs font-medium rounded-xl bg-red-600 hover:bg-red-700 text-white"
+              className="px-4 py-2 text-xs font-medium rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
             >
-              Enter Another Username
+              Account Setup
             </button>
           </div>
         </div>

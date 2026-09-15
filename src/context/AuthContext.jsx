@@ -3,13 +3,28 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+  // Helper to sanitize token
+  const sanitizeToken = (token) => {
+    if (!token || typeof token !== 'string') return null;
+    const trimmed = token.trim();
+    if (trimmed === 'local-session-token' || trimmed === 'oauth-session-token' || trimmed === 'null' || trimmed === 'undefined') {
+      return null;
+    }
+    return trimmed;
+  };
+
   // Owner authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!localStorage.getItem('commitstreak-owner-token');
+    return localStorage.getItem('commitstreak-is-auth') === 'true' || !!localStorage.getItem('commitstreak-owner-token');
   });
 
   const [ownerToken, setOwnerToken] = useState(() => {
-    return localStorage.getItem('commitstreak-owner-token') || null;
+    const raw = localStorage.getItem('commitstreak-owner-token');
+    const clean = sanitizeToken(raw);
+    if (raw && !clean) {
+      localStorage.removeItem('commitstreak-owner-token');
+    }
+    return clean;
   });
 
   // Current monitored username (empty by default for new users, or restored from localStorage)
@@ -32,18 +47,29 @@ export function AuthProvider({ children }) {
       loginOwner(token, user);
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (authStatus === 'success' && user) {
-      loginOwner('oauth-session-token', user);
+      loginOwner(null, user);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
   const loginOwner = (token, username) => {
     const cleanUser = (username || '').trim().replace(/^@/, '');
-    setOwnerToken(token);
+    const validToken = sanitizeToken(token);
+    
+    setOwnerToken(validToken);
     setIsAuthenticated(true);
-    setMonitoredUsername(cleanUser);
-    localStorage.setItem('commitstreak-owner-token', token);
-    localStorage.setItem('commitstreak-monitored-user', cleanUser);
+    localStorage.setItem('commitstreak-is-auth', 'true');
+
+    if (validToken) {
+      localStorage.setItem('commitstreak-owner-token', validToken);
+    } else {
+      localStorage.removeItem('commitstreak-owner-token');
+    }
+
+    if (cleanUser) {
+      setMonitoredUsername(cleanUser);
+      localStorage.setItem('commitstreak-monitored-user', cleanUser);
+    }
     setIsAuthModalOpen(false);
   };
 
@@ -51,6 +77,7 @@ export function AuthProvider({ children }) {
     setOwnerToken(null);
     setIsAuthenticated(false);
     setMonitoredUsername('');
+    localStorage.removeItem('commitstreak-is-auth');
     localStorage.removeItem('commitstreak-owner-token');
     localStorage.removeItem('commitstreak-monitored-user');
   };

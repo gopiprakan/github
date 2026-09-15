@@ -35,7 +35,7 @@ export default function ConnectGitHubModal() {
         message: 'No GITHUB_CLIENT_ID configured in environment. Connecting as verified account for @' + inputUsername.trim(),
       });
       setTimeout(() => {
-        loginOwner('local-session-token', inputUsername.trim());
+        loginOwner(null, inputUsername.trim());
         setFeedback({ type: 'success', message: `Connected as owner @${inputUsername.trim()}!` });
         setTimeout(() => {
           setIsAuthModalOpen(false);

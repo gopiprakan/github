@@ -34,6 +34,58 @@ export function getLanguageColor(lang) {
 }
 
 /**
+ * Check if a token string appears to be a legitimate GitHub API token.
+ * Prevents dummy strings (e.g. 'local-session-token') from causing 401 Bad Credentials errors.
+ */
+function isValidGitHubToken(token) {
+  if (!token || typeof token !== 'string') return false;
+  const trimmed = token.trim();
+  if (
+    trimmed === 'local-session-token' ||
+    trimmed === 'oauth-session-token' ||
+    trimmed === 'undefined' ||
+    trimmed === 'null' ||
+    trimmed === ''
+  ) {
+    return false;
+  }
+  return trimmed.length >= 10;
+}
+
+/**
+ * Helper to execute GitHub API fetch requests with automatic 401 Unauthorized fallback
+ */
+async function githubFetch(url, token = null) {
+  const headers = {
+    Accept: 'application/vnd.github.v3+json',
+  };
+
+  const hasValidToken = isValidGitHubToken(token);
+  if (hasValidToken) {
+    // GitHub supports Authorization: Bearer <token> or token <token>
+    headers.Authorization = `token ${token.trim()}`;
+  }
+
+  let response = await fetch(url, { headers });
+
+  // If request failed with 401 (Bad credentials / expired token), automatically retry without Authorization header
+  if (response.status === 401 && hasValidToken) {
+    console.warn('GitHub token rejected (401 Unauthorized). Retrying anonymously without token...');
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('commitstreak-owner-token');
+      }
+    } catch (e) {
+      // ignore
+    }
+    delete headers.Authorization;
+    response = await fetch(url, { headers });
+  }
+
+  return response;
+}
+
+/**
  * Fetch GitHub user profile
  * @param {string} username 
  * @param {string} token optional owner token
@@ -46,20 +98,22 @@ export async function fetchUserProfile(username, token = null) {
   const cleanUser = username.trim().replace(/^@/, '');
 
   try {
-    const headers = {
-      Accept: 'application/vnd.github.v3+json',
-    };
-    if (token) {
-      headers.Authorization = `token ${token}`;
-    }
-
-    const response = await fetch(`${GITHUB_API_URL}/users/${cleanUser}`, { headers });
+    const response = await githubFetch(`${GITHUB_API_URL}/users/${cleanUser}`, token);
     
     if (!response.ok) {
+      let errorMessage = `GitHub API error (${response.status})`;
+      if (response.status === 404) {
+        errorMessage = `User "@${cleanUser}" was not found on GitHub.`;
+      } else if (response.status === 403) {
+        errorMessage = `GitHub API rate limit reached. Please wait a few moments or connect a Personal Access Token.`;
+      } else if (response.status === 401) {
+        errorMessage = `GitHub authentication error (401). Please verify your token or use public monitor.`;
+      }
+
       return { 
         data: null, 
         isLive: false, 
-        error: response.status === 404 ? `User "@${cleanUser}" was not found on GitHub.` : `GitHub API error (${response.status})` 
+        error: errorMessage
       };
     }
 
@@ -102,12 +156,9 @@ export async function fetchUserRepositories(username, token = null) {
   const cleanUser = username.trim().replace(/^@/, '');
 
   try {
-    const headers = { Accept: 'application/vnd.github.v3+json' };
-    if (token) headers.Authorization = `token ${token}`;
-
-    const response = await fetch(
+    const response = await githubFetch(
       `${GITHUB_API_URL}/users/${cleanUser}/repos?sort=updated&per_page=100`,
-      { headers }
+      token
     );
 
     if (!response.ok) {
@@ -153,10 +204,7 @@ export async function fetchRecentEvents(username, token = null) {
   const cleanUser = username.trim().replace(/^@/, '');
 
   try {
-    const headers = { Accept: 'application/vnd.github.v3+json' };
-    if (token) headers.Authorization = `token ${token}`;
-
-    const response = await fetch(`${GITHUB_API_URL}/users/${cleanUser}/events/public?per_page=100`, { headers });
+    const response = await githubFetch(`${GITHUB_API_URL}/users/${cleanUser}/events/public?per_page=100`, token);
     if (!response.ok) return { data: [], isLive: false, error: `GitHub events returned ${response.status}` };
 
     const events = await response.json();

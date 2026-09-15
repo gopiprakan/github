@@ -112,10 +112,14 @@ app.get('/api/github/user', async (req, res) => {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'CommitStreak-Monitor',
   };
-  if (pat) headers.Authorization = `token ${pat}`;
+  if (pat && pat.trim() && pat.trim().length > 10) headers.Authorization = `token ${pat.trim()}`;
 
   try {
-    const response = await fetch(`https://api.github.com/users/${targetUser}`, { headers });
+    let response = await fetch(`https://api.github.com/users/${targetUser}`, { headers });
+    if (response.status === 401 && headers.Authorization) {
+      delete headers.Authorization;
+      response = await fetch(`https://api.github.com/users/${targetUser}`, { headers });
+    }
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
@@ -137,10 +141,14 @@ app.get('/api/github/repos', async (req, res) => {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'CommitStreak-Monitor',
   };
-  if (pat) headers.Authorization = `token ${pat}`;
+  if (pat && pat.trim() && pat.trim().length > 10) headers.Authorization = `token ${pat.trim()}`;
 
   try {
-    const response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
+    let response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
+    if (response.status === 401 && headers.Authorization) {
+      delete headers.Authorization;
+      response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
+    }
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {

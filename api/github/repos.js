@@ -13,12 +13,17 @@ export default async function handler(req, res) {
     'User-Agent': 'CommitStreak-Monitor',
   };
 
-  if (pat) {
-    headers.Authorization = `token ${pat}`;
+  if (pat && pat.trim() && pat.trim().length > 10) {
+    headers.Authorization = `token ${pat.trim()}`;
   }
 
   try {
-    const response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
+    let response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
+    if (response.status === 401 && headers.Authorization) {
+      delete headers.Authorization;
+      response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
+    }
+
     if (!response.ok) {
       return res.status(response.status).json({
         error: `GitHub returned status ${response.status}`,
