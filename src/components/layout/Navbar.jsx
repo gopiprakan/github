@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Flame, Github, Menu, X, BookOpen, GitFork, LayoutDashboard, Sparkles, UserCheck } from 'lucide-react';
+import { Flame, Github, Menu, X, BookOpen, GitFork, LayoutDashboard, Search, UserCheck } from 'lucide-react';
 import ThemeToggle from '../common/ThemeToggle';
 import Badge from '../common/Badge';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar({ activePage, setActivePage }) {
-  const { isAuthenticated, monitoredUsername, isDemoMode, setIsAuthModalOpen } = useAuth();
+  const { isAuthenticated, monitoredUsername, setIsAuthModalOpen, switchMonitoredUser } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [quickUser, setQuickUser] = useState('');
 
   const navItems = [
     { id: 'home', label: 'Home' },
@@ -19,6 +20,15 @@ export default function Navbar({ activePage, setActivePage }) {
     setActivePage(pageId);
     setIsMobileMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleQuickSubmit = (e) => {
+    e.preventDefault();
+    if (quickUser.trim()) {
+      switchMonitoredUser(quickUser.trim());
+      setQuickUser('');
+      setActivePage('dashboard');
+    }
   };
 
   return (
@@ -39,13 +49,13 @@ export default function Navbar({ activePage, setActivePage }) {
                   Commit<span className="text-emerald-500">Streak</span>
                 </span>
                 <span className="block text-[10px] font-mono text-gh-lightMuted dark:text-gh-darkMuted -mt-0.5">
-                  daily coding monitor
+                  live github monitor
                 </span>
               </div>
             </button>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 ml-4">
+            <nav className="hidden md:flex items-center gap-1 ml-2">
               {navItems.map((item) => {
                 const isActive = activePage === item.id;
                 return (
@@ -67,25 +77,34 @@ export default function Navbar({ activePage, setActivePage }) {
           </div>
 
           {/* Right Action Items */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Live Streak Pill */}
-            <div 
-              onClick={() => handleNavClick('dashboard')}
-              className="cursor-pointer hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 shadow-sm animate-streak-pulse"
-              title="Active consecutive coding streak"
-            >
-              <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span>47 DAYS</span>
-            </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Quick user lookup input (desktop) */}
+            <form onSubmit={handleQuickSubmit} className="hidden lg:flex items-center relative">
+              <input
+                type="text"
+                placeholder="Lookup GitHub user..."
+                value={quickUser}
+                onChange={(e) => setQuickUser(e.target.value)}
+                className="w-44 pl-7 pr-3 py-1 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText placeholder:text-gh-lightMuted focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+              />
+              <Search className="w-3.5 h-3.5 text-gh-lightMuted absolute left-2.5 top-2 pointer-events-none" />
+            </form>
 
-            {/* Demo / Live Indicator */}
-            <Badge
-              variant={isDemoMode ? 'default' : 'emerald'}
-              size="xs"
-              className="hidden lg:inline-flex"
-            >
-              {isDemoMode ? 'Sample Mode' : `Live: @${monitoredUsername}`}
-            </Badge>
+            {/* Monitored User Badge */}
+            {monitoredUsername ? (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-300 shadow-sm"
+                title="Currently monitoring"
+              >
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>@{monitoredUsername}</span>
+              </button>
+            ) : (
+              <span className="hidden sm:inline-flex text-[11px] font-mono text-gh-lightMuted dark:text-gh-darkMuted">
+                No user selected
+              </span>
+            )}
 
             {/* Connect GitHub Button */}
             <button
@@ -99,10 +118,10 @@ export default function Navbar({ activePage, setActivePage }) {
             >
               <Github className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">
-                {isAuthenticated ? `@${monitoredUsername}` : 'Connect GitHub'}
+                {isAuthenticated ? `@${monitoredUsername}` : (monitoredUsername ? 'Change Account' : 'Connect GitHub')}
               </span>
               <span className="sm:hidden">
-                {isAuthenticated ? 'Owner' : 'Connect'}
+                {isAuthenticated ? 'Connected' : 'Account'}
               </span>
             </button>
 
@@ -139,8 +158,10 @@ export default function Navbar({ activePage, setActivePage }) {
             </button>
           ))}
           <div className="pt-2 border-t border-gh-lightBorder dark:border-gh-darkBorder flex items-center justify-between text-xs px-1">
-            <span className="text-gh-lightMuted dark:text-gh-darkMuted">Current Streak:</span>
-            <span className="font-mono font-bold text-emerald-500">47 Days Active 🔥</span>
+            <span className="text-gh-lightMuted dark:text-gh-darkMuted">Monitored:</span>
+            <span className="font-mono font-semibold text-emerald-500">
+              {monitoredUsername ? `@${monitoredUsername}` : 'None (Click Connect)'}
+            </span>
           </div>
         </div>
       )}

@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_JOURNAL_ENTRIES } from '../services/mockData';
 
 const JournalContext = createContext();
 
@@ -8,12 +7,13 @@ export function JournalProvider({ children }) {
     const saved = localStorage.getItem('commitstreak-journal-entries');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
       } catch (e) {
         console.error('Failed to parse saved journal entries:', e);
       }
     }
-    return INITIAL_JOURNAL_ENTRIES;
+    return [];
   });
 
   const [selectedTag, setSelectedTag] = useState('All');
