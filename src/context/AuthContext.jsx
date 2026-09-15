@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { SAMPLE_PROFILE } from '../services/mockData';
 
 const AuthContext = createContext();
 
@@ -13,15 +12,9 @@ export function AuthProvider({ children }) {
     return localStorage.getItem('commitstreak-owner-token') || null;
   });
 
-  // Current monitored username (defaults to sample username, or connected owner)
+  // Current monitored username (empty by default for new users, or restored from localStorage)
   const [monitoredUsername, setMonitoredUsername] = useState(() => {
-    return localStorage.getItem('commitstreak-monitored-user') || SAMPLE_PROFILE.username;
-  });
-
-  // Is using live API or sample data mode
-  const [isDemoMode, setIsDemoMode] = useState(() => {
-    const saved = localStorage.getItem('commitstreak-demo-mode');
-    return saved !== null ? saved === 'true' : true; // default true until user changes or connects
+    return localStorage.getItem('commitstreak-monitored-user') || '';
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -37,50 +30,41 @@ export function AuthProvider({ children }) {
 
     if (token && user) {
       loginOwner(token, user);
-      // Clean query params
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (authStatus === 'success' && user) {
-      loginOwner('demo-oauth-session-token', user);
+      loginOwner('oauth-session-token', user);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
   const loginOwner = (token, username) => {
+    const cleanUser = (username || '').trim().replace(/^@/, '');
     setOwnerToken(token);
     setIsAuthenticated(true);
-    setMonitoredUsername(username);
-    setIsDemoMode(false);
+    setMonitoredUsername(cleanUser);
     localStorage.setItem('commitstreak-owner-token', token);
-    localStorage.setItem('commitstreak-monitored-user', username);
-    localStorage.setItem('commitstreak-demo-mode', 'false');
+    localStorage.setItem('commitstreak-monitored-user', cleanUser);
     setIsAuthModalOpen(false);
   };
 
   const logoutOwner = () => {
     setOwnerToken(null);
     setIsAuthenticated(false);
+    setMonitoredUsername('');
     localStorage.removeItem('commitstreak-owner-token');
-    // keep or reset username
-    setMonitoredUsername(SAMPLE_PROFILE.username);
-    setIsDemoMode(true);
-    localStorage.setItem('commitstreak-demo-mode', 'true');
-    localStorage.setItem('commitstreak-monitored-user', SAMPLE_PROFILE.username);
+    localStorage.removeItem('commitstreak-monitored-user');
   };
 
-  const switchMonitoredUser = (newUsername, isLive = true) => {
-    const cleanUser = newUsername.trim().replace(/^@/, '');
+  const switchMonitoredUser = (newUsername) => {
+    const cleanUser = (newUsername || '').trim().replace(/^@/, '');
     if (!cleanUser) return;
     setMonitoredUsername(cleanUser);
-    setIsDemoMode(!isLive);
     localStorage.setItem('commitstreak-monitored-user', cleanUser);
-    localStorage.setItem('commitstreak-demo-mode', String(!isLive));
   };
 
-  const resetToSampleData = () => {
-    setMonitoredUsername(SAMPLE_PROFILE.username);
-    setIsDemoMode(true);
-    localStorage.setItem('commitstreak-monitored-user', SAMPLE_PROFILE.username);
-    localStorage.setItem('commitstreak-demo-mode', 'true');
+  const clearMonitoredUser = () => {
+    setMonitoredUsername('');
+    localStorage.removeItem('commitstreak-monitored-user');
   };
 
   return (
@@ -89,7 +73,6 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         ownerToken,
         monitoredUsername,
-        isDemoMode,
         isAuthModalOpen,
         setIsAuthModalOpen,
         authError,
@@ -99,7 +82,7 @@ export function AuthProvider({ children }) {
         loginOwner,
         logoutOwner,
         switchMonitoredUser,
-        resetToSampleData,
+        clearMonitoredUser,
       }}
     >
       {children}
