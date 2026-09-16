@@ -6,7 +6,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Username parameter is required.' });
   }
 
-  const pat = process.env.GITHUB_PAT;
+  const pat =
+    process.env.GITHUB_PAT ||
+    process.env.GITHUB_TOKEN ||
+    process.env.VITE_GITHUB_PAT ||
+    process.env.VITE_GITHUB_TOKEN;
 
   const headers = {
     Accept: 'application/vnd.github.v3+json',
@@ -14,7 +18,7 @@ export default async function handler(req, res) {
   };
 
   if (pat && pat.trim() && pat.trim().length > 10) {
-    headers.Authorization = `token ${pat.trim()}`;
+    headers.Authorization = `Bearer ${pat.trim()}`;
   }
 
   try {
