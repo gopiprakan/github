@@ -15,21 +15,32 @@ export function AuthProvider({ children }) {
 
   // Owner authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('commitstreak-is-auth') === 'true' || !!localStorage.getItem('commitstreak-owner-token');
+    return (
+      localStorage.getItem('commitstreak-is-auth') === 'true' ||
+      !!localStorage.getItem('commitstreak-owner-token') ||
+      !!(import.meta.env?.VITE_GITHUB_PAT || import.meta.env?.VITE_GITHUB_TOKEN)
+    );
   });
 
   const [ownerToken, setOwnerToken] = useState(() => {
-    const raw = localStorage.getItem('commitstreak-owner-token');
+    const raw =
+      localStorage.getItem('commitstreak-owner-token') ||
+      import.meta.env?.VITE_GITHUB_PAT ||
+      import.meta.env?.VITE_GITHUB_TOKEN;
     const clean = sanitizeToken(raw);
-    if (raw && !clean) {
+    if (localStorage.getItem('commitstreak-owner-token') && !clean) {
       localStorage.removeItem('commitstreak-owner-token');
     }
     return clean;
   });
 
-  // Current monitored username (empty by default for new users, or restored from localStorage)
+  // Current monitored username (restored from localStorage, or default env username, or gopiprakan)
   const [monitoredUsername, setMonitoredUsername] = useState(() => {
-    return localStorage.getItem('commitstreak-monitored-user') || '';
+    return (
+      localStorage.getItem('commitstreak-monitored-user') ||
+      import.meta.env?.VITE_DEFAULT_GITHUB_USERNAME ||
+      'gopiprakan'
+    );
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);

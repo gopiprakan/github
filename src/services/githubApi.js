@@ -60,10 +60,11 @@ async function githubFetch(url, token = null) {
     Accept: 'application/vnd.github.v3+json',
   };
 
-  const hasValidToken = isValidGitHubToken(token);
+  const rawToken = token || import.meta.env?.VITE_GITHUB_PAT || import.meta.env?.VITE_GITHUB_TOKEN;
+  const hasValidToken = isValidGitHubToken(rawToken);
   if (hasValidToken) {
-    // GitHub supports Authorization: Bearer <token> or token <token>
-    headers.Authorization = `token ${token.trim()}`;
+    // GitHub supports Authorization: Bearer <token> for personal access tokens & OAuth
+    headers.Authorization = `Bearer ${rawToken.trim()}`;
   }
 
   let response = await fetch(url, { headers });
