@@ -106,13 +106,17 @@ app.get('/api/github/user', async (req, res) => {
     return res.status(400).json({ error: 'Username parameter is required.' });
   }
 
-  const pat = process.env.GITHUB_PAT;
+  const pat =
+    process.env.GITHUB_PAT ||
+    process.env.GITHUB_TOKEN ||
+    process.env.VITE_GITHUB_PAT ||
+    process.env.VITE_GITHUB_TOKEN;
 
   const headers = {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'CommitStreak-Monitor',
   };
-  if (pat && pat.trim() && pat.trim().length > 10) headers.Authorization = `token ${pat.trim()}`;
+  if (pat && pat.trim() && pat.trim().length > 10) headers.Authorization = `Bearer ${pat.trim()}`;
 
   try {
     let response = await fetch(`https://api.github.com/users/${targetUser}`, { headers });
@@ -135,13 +139,17 @@ app.get('/api/github/repos', async (req, res) => {
     return res.status(400).json({ error: 'Username parameter is required.' });
   }
 
-  const pat = process.env.GITHUB_PAT;
+  const pat =
+    process.env.GITHUB_PAT ||
+    process.env.GITHUB_TOKEN ||
+    process.env.VITE_GITHUB_PAT ||
+    process.env.VITE_GITHUB_TOKEN;
 
   const headers = {
     Accept: 'application/vnd.github.v3+json',
     'User-Agent': 'CommitStreak-Monitor',
   };
-  if (pat && pat.trim() && pat.trim().length > 10) headers.Authorization = `token ${pat.trim()}`;
+  if (pat && pat.trim() && pat.trim().length > 10) headers.Authorization = `Bearer ${pat.trim()}`;
 
   try {
     let response = await fetch(`https://api.github.com/users/${targetUser}/repos?sort=updated&per_page=100`, { headers });
