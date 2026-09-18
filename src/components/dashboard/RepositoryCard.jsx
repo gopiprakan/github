@@ -1,8 +1,8 @@
 import React from 'react';
-import { Star, GitFork, BookMarked, ExternalLink, Calendar, Shield } from 'lucide-react';
+import { Star, GitFork, BookMarked, ExternalLink, Calendar, Shield, Code, Settings, Edit3 } from 'lucide-react';
 import Badge from '../common/Badge';
 
-export default function RepositoryCard({ repo, onSelect }) {
+export default function RepositoryCard({ repo, onSelect, onEditFiles, onEditSettings }) {
   const formatDate = (dateStr) => {
     try {
       return new Date(dateStr).toLocaleDateString('en-US', {
@@ -23,7 +23,7 @@ export default function RepositoryCard({ repo, onSelect }) {
           <div className="flex items-center gap-2 min-w-0">
             <BookMarked className="w-4 h-4 text-emerald-500 shrink-0" />
             <button
-              onClick={() => onSelect(repo)}
+              onClick={() => onSelect ? onSelect(repo) : onEditFiles?.(repo)}
               className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText group-hover:text-emerald-500 transition-colors truncate text-left"
             >
               {repo.name}
@@ -59,48 +59,72 @@ export default function RepositoryCard({ repo, onSelect }) {
         )}
       </div>
 
-      {/* Footer metadata */}
-      <div className="pt-3 border-t border-gh-lightBorder dark:border-gh-darkBorder flex items-center justify-between text-xs text-gh-lightMuted dark:text-gh-darkMuted">
-        <div className="flex items-center gap-3">
-          {repo.language && (
-            <span className="flex items-center gap-1.5 font-medium">
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: repo.languageColor || '#3178c6' }}
-              />
-              {repo.language}
+      {/* Footer metadata & Quick Actions */}
+      <div className="pt-3 border-t border-gh-lightBorder dark:border-gh-darkBorder space-y-2.5">
+        <div className="flex items-center justify-between text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+          <div className="flex items-center gap-3">
+            {repo.language && (
+              <span className="flex items-center gap-1.5 font-medium">
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ backgroundColor: repo.languageColor || '#3178c6' }}
+                />
+                {repo.language}
+              </span>
+            )}
+
+            <span className="flex items-center gap-1">
+              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              {repo.stars}
             </span>
-          )}
 
-          <span className="flex items-center gap-1">
-            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-            {repo.stars}
-          </span>
+            <span className="flex items-center gap-1">
+              <GitFork className="w-3.5 h-3.5" />
+              {repo.forks}
+            </span>
+          </div>
 
-          <span className="flex items-center gap-1">
-            <GitFork className="w-3.5 h-3.5" />
-            {repo.forks}
-          </span>
+          <div className="flex items-center gap-1.5">
+            {onEditSettings && (
+              <button
+                onClick={() => onEditSettings(repo)}
+                title="Repository Settings"
+                className="p-1 rounded-lg text-gh-lightMuted dark:text-gh-darkMuted hover:text-emerald-500 hover:bg-gray-100 dark:hover:bg-gh-darkCard transition-colors"
+              >
+                <Settings className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <a
+              href={repo.htmlUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open GitHub repository"
+              title="Open repository on GitHub"
+              className="p-1 rounded-lg text-gh-lightMuted dark:text-gh-darkMuted hover:text-emerald-500 hover:bg-gray-100 dark:hover:bg-gh-darkCard transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
         </div>
 
+        {/* Primary Action Buttons */}
         <div className="flex items-center gap-2">
           <button
+            onClick={() => onEditFiles ? onEditFiles(repo) : onSelect?.(repo)}
+            className="flex-1 py-1.5 px-2.5 text-[11px] font-semibold rounded-xl bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <Code className="w-3.5 h-3.5" />
+            <span>Edit Files & Code</span>
+          </button>
+          <button
             onClick={() => onSelect(repo)}
-            className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+            className="py-1.5 px-2.5 text-[11px] font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-colors"
           >
             Details
           </button>
-          <a
-            href={repo.htmlUrl}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open GitHub repository"
-            className="p-1 text-gh-lightMuted dark:text-gh-darkMuted hover:text-emerald-500 transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
         </div>
       </div>
     </div>
   );
 }
+
