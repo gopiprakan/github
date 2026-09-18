@@ -8,6 +8,8 @@ import LanguageBreakdown from '../components/dashboard/LanguageBreakdown';
 import RecentCommits from '../components/dashboard/RecentCommits';
 import RepositoryCard from '../components/dashboard/RepositoryCard';
 import RepositoryModal from '../components/dashboard/RepositoryModal';
+import RepoFileManagerModal from '../components/repository/RepoFileManagerModal';
+import EditRepoModal from '../components/repository/EditRepoModal';
 import Skeleton from '../components/common/Skeleton';
 import Badge from '../components/common/Badge';
 import { useAuth } from '../context/AuthContext';
@@ -32,6 +34,10 @@ export default function DashboardPage({ onNavigate }) {
 
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [isRepoModalOpen, setIsRepoModalOpen] = useState(false);
+  const [fileManagerRepo, setFileManagerRepo] = useState(null);
+  const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
+  const [editSettingsRepo, setEditSettingsRepo] = useState(null);
+  const [isEditSettingsOpen, setIsEditSettingsOpen] = useState(false);
   const [searchHandle, setSearchHandle] = useState('');
 
   const loadData = async (userToLoad) => {
@@ -325,6 +331,14 @@ export default function DashboardPage({ onNavigate }) {
                   key={repo.id}
                   repo={repo}
                   onSelect={handleSelectRepo}
+                  onEditFiles={(r) => {
+                    setFileManagerRepo(r);
+                    setIsFileManagerOpen(true);
+                  }}
+                  onEditSettings={(r) => {
+                    setEditSettingsRepo(r);
+                    setIsEditSettingsOpen(true);
+                  }}
                 />
               ))}
             </div>
@@ -344,6 +358,39 @@ export default function DashboardPage({ onNavigate }) {
         onClose={() => {
           setIsRepoModalOpen(false);
           setSelectedRepo(null);
+        }}
+        onEditFiles={(r) => {
+          setFileManagerRepo(r);
+          setIsFileManagerOpen(true);
+        }}
+        onEditSettings={(r) => {
+          setEditSettingsRepo(r);
+          setIsEditSettingsOpen(true);
+        }}
+      />
+
+      {/* File Explorer & Code Editor Modal */}
+      <RepoFileManagerModal
+        repo={fileManagerRepo}
+        isOpen={isFileManagerOpen}
+        onClose={() => {
+          setIsFileManagerOpen(false);
+          setFileManagerRepo(null);
+        }}
+        onRepoUpdated={() => loadData(monitoredUsername)}
+      />
+
+      {/* Edit Repository Settings Modal */}
+      <EditRepoModal
+        repo={editSettingsRepo}
+        isOpen={isEditSettingsOpen}
+        onClose={() => {
+          setIsEditSettingsOpen(false);
+          setEditSettingsRepo(null);
+        }}
+        onRepoUpdated={() => loadData(monitoredUsername)}
+        onRepoDeleted={(deletedName) => {
+          setReposData(prev => prev.filter(r => r.name !== deletedName));
         }}
       />
     </div>

@@ -1,20 +1,49 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, ArrowUpDown, BookMarked, ExternalLink, Star, GitFork, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  ArrowUpDown,
+  BookMarked,
+  ExternalLink,
+  Star,
+  GitFork,
+  Sparkles,
+  RefreshCw,
+  AlertCircle,
+  Plus,
+  Code,
+  Settings,
+  Key,
+  CheckCircle2,
+} from 'lucide-react';
 import RepositoryCard from '../components/dashboard/RepositoryCard';
 import RepositoryModal from '../components/dashboard/RepositoryModal';
+import RepoFileManagerModal from '../components/repository/RepoFileManagerModal';
+import CreateRepoModal from '../components/repository/CreateRepoModal';
+import EditRepoModal from '../components/repository/EditRepoModal';
 import Skeleton from '../components/common/Skeleton';
 import { useAuth } from '../context/AuthContext';
 import { fetchUserRepositories } from '../services/githubApi';
 
 export default function RepositoriesPage() {
-  const { monitoredUsername, ownerToken, switchMonitoredUser } = useAuth();
+  const { monitoredUsername, ownerToken, setIsAuthModalOpen, switchMonitoredUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [repositories, setRepositories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('All');
   const [sortBy, setSortBy] = useState('updated'); // 'stars' | 'updated' | 'name'
+
+  // Modals state
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [fileManagerRepo, setFileManagerRepo] = useState(null);
+  const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
+
+  const [editSettingsRepo, setEditSettingsRepo] = useState(null);
+  const [isEditSettingsOpen, setIsEditSettingsOpen] = useState(false);
+
+  const [isCreateRepoOpen, setIsCreateRepoOpen] = useState(false);
   const [newHandle, setNewHandle] = useState('');
 
   const loadRepos = async (user) => {
@@ -73,6 +102,16 @@ export default function RepositoriesPage() {
     setIsModalOpen(true);
   };
 
+  const handleOpenFileManager = (repo) => {
+    setFileManagerRepo(repo);
+    setIsFileManagerOpen(true);
+  };
+
+  const handleOpenEditSettings = (repo) => {
+    setEditSettingsRepo(repo);
+    setIsEditSettingsOpen(true);
+  };
+
   const handleUserSubmit = (e) => {
     e.preventDefault();
     if (newHandle.trim()) {
@@ -81,14 +120,26 @@ export default function RepositoriesPage() {
     }
   };
 
+  const handleRepoCreated = (newRepo) => {
+    loadRepos(monitoredUsername);
+  };
+
+  const handleRepoUpdated = () => {
+    loadRepos(monitoredUsername);
+  };
+
+  const handleRepoDeleted = (deletedName) => {
+    setRepositories(prev => prev.filter(r => r.name !== deletedName));
+  };
+
   if (!monitoredUsername) {
     return (
       <div className="py-12 max-w-xl mx-auto px-4 text-center">
         <div className="rounded-3xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-8 shadow-sm space-y-4">
           <BookMarked className="w-12 h-12 text-emerald-500 mx-auto" />
-          <h3 className="text-xl font-bold text-gh-lightText dark:text-gh-darkText">Explore Repositories</h3>
+          <h3 className="text-xl font-bold text-gh-lightText dark:text-gh-darkText">Explore & Edit Repositories</h3>
           <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted">
-            Enter any GitHub username to view all their public repositories and source code stats.
+            Enter any GitHub username to view, explore, and edit repositories and source code files.
           </p>
           <form onSubmit={handleUserSubmit} className="flex gap-2 max-w-sm mx-auto">
             <input
@@ -114,7 +165,7 @@ export default function RepositoriesPage() {
     <div className="py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
       {/* Header */}
       <div className="rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
@@ -125,11 +176,20 @@ export default function RepositoriesPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
-              Public open source repositories maintained by <span className="font-mono text-emerald-500 font-medium">@{monitoredUsername}</span>.
+              Browse, view files, code and commit live changes directly to GitHub for <span className="font-mono text-emerald-500 font-medium">@{monitoredUsername}</span>.
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* New Repo CTA */}
+            <button
+              onClick={() => setIsCreateRepoOpen(true)}
+              className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Repository</span>
+            </button>
+
             <button
               onClick={() => loadRepos(monitoredUsername)}
               title="Refresh repositories"
@@ -137,13 +197,14 @@ export default function RepositoriesPage() {
             >
               <RefreshCw className="w-3.5 h-3.5" /> Refresh
             </button>
+
             <a
               href={`https://github.com/${monitoredUsername}?tab=repositories`}
               target="_blank"
               rel="noreferrer"
-              className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-colors flex items-center justify-center gap-1.5"
+              className="px-3.5 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-colors flex items-center justify-center gap-1.5"
             >
-              <span>View on GitHub</span>
+              <span>GitHub</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -199,19 +260,26 @@ export default function RepositoriesPage() {
       {/* Repositories Grid */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Skeleton className="h-44 rounded-2xl" count={6} />
+          <Skeleton className="h-48 rounded-2xl" count={6} />
         </div>
       ) : filteredRepos.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-dashed border-gh-lightBorder dark:border-gh-darkBorder bg-white/50 dark:bg-gh-darkPanel/50">
-          <BookMarked className="w-10 h-10 text-gh-lightMuted dark:text-gh-darkMuted mx-auto mb-3 opacity-60" />
-          <h4 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText mb-1">
+        <div className="p-12 text-center rounded-2xl border border-dashed border-gh-lightBorder dark:border-gh-darkBorder bg-white/50 dark:bg-gh-darkPanel/50 space-y-3">
+          <BookMarked className="w-10 h-10 text-gh-lightMuted dark:text-gh-darkMuted mx-auto mb-2 opacity-60" />
+          <h4 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText">
             No Repositories Found
           </h4>
-          <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+          <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted max-w-sm mx-auto">
             {searchQuery || selectedLanguage !== 'All' 
               ? 'Try adjusting your search criteria or language filter.' 
-              : `No public repositories found for @${monitoredUsername}.`}
+              : `No public repositories found for @${monitoredUsername}. You can create one now.`}
           </p>
+          <button
+            onClick={() => setIsCreateRepoOpen(true)}
+            className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white inline-flex items-center gap-1.5"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Create First Repository</span>
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -220,12 +288,14 @@ export default function RepositoriesPage() {
               key={repo.id}
               repo={repo}
               onSelect={handleSelectRepo}
+              onEditFiles={handleOpenFileManager}
+              onEditSettings={handleOpenEditSettings}
             />
           ))}
         </div>
       )}
 
-      {/* Modal */}
+      {/* Details Modal */}
       <RepositoryModal
         repo={selectedRepo}
         isOpen={isModalOpen}
@@ -233,7 +303,40 @@ export default function RepositoriesPage() {
           setIsModalOpen(false);
           setSelectedRepo(null);
         }}
+        onEditFiles={handleOpenFileManager}
+        onEditSettings={handleOpenEditSettings}
+      />
+
+      {/* File Explorer & Code Editor Modal */}
+      <RepoFileManagerModal
+        repo={fileManagerRepo}
+        isOpen={isFileManagerOpen}
+        onClose={() => {
+          setIsFileManagerOpen(false);
+          setFileManagerRepo(null);
+        }}
+        onRepoUpdated={handleRepoUpdated}
+      />
+
+      {/* Create Repository Modal */}
+      <CreateRepoModal
+        isOpen={isCreateRepoOpen}
+        onClose={() => setIsCreateRepoOpen(false)}
+        onRepoCreated={handleRepoCreated}
+      />
+
+      {/* Edit Repository Settings Modal */}
+      <EditRepoModal
+        repo={editSettingsRepo}
+        isOpen={isEditSettingsOpen}
+        onClose={() => {
+          setIsEditSettingsOpen(false);
+          setEditSettingsRepo(null);
+        }}
+        onRepoUpdated={handleRepoUpdated}
+        onRepoDeleted={handleRepoDeleted}
       />
     </div>
   );
 }
+

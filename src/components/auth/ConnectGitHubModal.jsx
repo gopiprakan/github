@@ -229,9 +229,24 @@ export default function ConnectGitHubModal() {
 
         {activeTab === 'pat' && (
           <form onSubmit={handlePATConnect} className="space-y-4">
-            <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted">
-              Optional: Enter a GitHub Personal Access Token (classic with <code className="font-mono text-emerald-500">read:user</code> scope) to increase rate limits to 5,000 requests/hr.
-            </p>
+            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 space-y-1.5">
+              <p className="font-semibold flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" /> Full GitHub Read & Write Sync
+              </p>
+              <p className="text-[11px] leading-relaxed">
+                Enter a GitHub Personal Access Token (classic) with <code className="font-mono font-bold">repo</code> & <code className="font-mono font-bold">read:user</code> scopes to edit files, commit changes live to GitHub, create new repos, and increase rate limits.
+              </p>
+              <a
+                href="https://github.com/settings/tokens/new?scopes=repo,read:user&description=CommitStreak-Editor"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:underline pt-0.5"
+              >
+                <span>Generate Token on GitHub (pre-selected scopes)</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
             <div>
               <label className="block text-xs font-medium text-gh-lightMuted dark:text-gh-darkMuted mb-1">
                 GitHub Username
