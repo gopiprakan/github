@@ -14,6 +14,7 @@ import {
   BarChart2,
   CheckCircle2,
   Search,
+  Code,
 } from 'lucide-react';
 import Badge from '../components/common/Badge';
 import { useAuth } from '../context/AuthContext';
