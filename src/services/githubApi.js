@@ -306,16 +306,24 @@ export function calculateLanguageBreakdown(repos = []) {
 }
 
 /**
- * Calculate 52-week contribution calendar and activity statistics from user's real data
+ * Calculate 52-week contribution calendar and accurate streak statistics from user's real data
  */
-export function calculateActivityAndContributions(events = [], repos = []) {
+export function calculateActivityAndContributions(events = [], repos = [], externalContributions = null, totalYearlyOverride = null) {
   const today = new Date();
-  const totalDays = 364; // 52 weeks * 7 days
   
   // Date-indexed commit counts map
   const dateCounts = {};
 
-  // 1. Process recent event timestamps
+  // 1. If external official contributions supplied, initialize with those
+  if (externalContributions && Array.isArray(externalContributions)) {
+    externalContributions.forEach(item => {
+      if (item.date) {
+        dateCounts[item.date] = Number(item.count || 0);
+      }
+    });
+  }
+
+  // 2. Overlay recent event timestamps
   if (events && Array.isArray(events)) {
     events.forEach(e => {
       if (e.timestamp) {
@@ -325,8 +333,8 @@ export function calculateActivityAndContributions(events = [], repos = []) {
     });
   }
 
-  // 2. Process repo update timestamps
-  if (repos && Array.isArray(repos)) {
+  // 3. Overlay repo update timestamps if no external contributions
+  if ((!externalContributions || externalContributions.length === 0) && repos && Array.isArray(repos)) {
     repos.forEach(r => {
       if (r.updatedAt) {
         const d = r.updatedAt.split('T')[0];
@@ -335,11 +343,12 @@ export function calculateActivityAndContributions(events = [], repos = []) {
     });
   }
 
+  const totalDays = 364; // 52 weeks * 7 days
   const contributions = [];
   let totalCommitsYear = 0;
   let activeDaysThisYear = 0;
 
-  // Build daily entries for past 52 weeks
+  // Build daily entries for past 52 weeks ending today
   for (let i = totalDays; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
@@ -366,20 +375,48 @@ export function calculateActivityAndContributions(events = [], repos = []) {
     });
   }
 
-  // Calculate current streak & longest streak
+  // Calculate true current streak & longest streak
+  const todayIndex = contributions.length - 1;
+  const yesterdayIndex = contributions.length - 2;
+
+  const todayCount = contributions[todayIndex]?.count || 0;
+  const yesterdayCount = contributions[yesterdayIndex]?.count || 0;
+
   let currentStreak = 0;
+  let streakStatus = 'inactive'; // 'active_today' | 'at_risk' | 'inactive'
+  let streakMessage = 'No active streak. Make a commit today to begin a new streak!';
+
+  if (todayCount > 0) {
+    currentStreak = 1;
+    for (let i = yesterdayIndex; i >= 0; i--) {
+      if (contributions[i].count > 0) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+    streakStatus = 'active_today';
+    streakMessage = `Streak active today! ${todayCount} commit${todayCount > 1 ? 's' : ''} recorded.`;
+  } else if (yesterdayCount > 0) {
+    currentStreak = 1;
+    for (let i = yesterdayIndex - 1; i >= 0; i--) {
+      if (contributions[i].count > 0) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
+    streakStatus = 'at_risk';
+    streakMessage = `Streak at risk! (${currentStreak} day${currentStreak > 1 ? 's' : ''} streak). Make a commit today before midnight!`;
+  } else {
+    currentStreak = 0;
+    streakStatus = 'inactive';
+    streakMessage = 'No active streak. Push code today to start a streak!';
+  }
+
+  // Calculate longest streak across the entire 52-week period
   let longestStreak = 0;
   let tempStreak = 0;
-
-  for (let i = contributions.length - 1; i >= 0; i--) {
-    if (contributions[i].count > 0) {
-      currentStreak++;
-    } else {
-      // If today has no commit yet, don't break streak if yesterday had commits
-      if (i === contributions.length - 1) continue;
-      break;
-    }
-  }
 
   for (let i = 0; i < contributions.length; i++) {
     if (contributions[i].count > 0) {
@@ -389,6 +426,8 @@ export function calculateActivityAndContributions(events = [], repos = []) {
       tempStreak = 0;
     }
   }
+
+  longestStreak = Math.max(longestStreak, currentStreak);
 
   // Calculate weekly activity cadence (Mon - Sun)
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -421,13 +460,39 @@ export function calculateActivityAndContributions(events = [], repos = []) {
 
   return {
     contributions,
-    totalCommitsYear: Math.max(totalCommitsYear, events.length),
+    totalCommitsYear: totalYearlyOverride ? Math.max(totalYearlyOverride, totalCommitsYear) : Math.max(totalCommitsYear, events.length),
     activeDaysThisYear,
-    currentStreak: currentStreak || (events.length > 0 ? 1 : 0),
-    longestStreak: Math.max(longestStreak, currentStreak, events.length > 0 ? 1 : 0),
+    currentStreak,
+    longestStreak,
+    streakStatus,
+    streakMessage,
+    todayCount,
+    yesterdayCount,
     weeklyCadence,
     monthlyActivity,
   };
+}
+
+/**
+ * Fetch official GitHub contribution calendar data and calculate accurate streak metrics
+ */
+export async function fetchUserContributions(username, events = [], repos = [], token = null) {
+  const cleanUser = (username || '').trim().replace(/^@/, '');
+  if (!cleanUser) return calculateActivityAndContributions(events, repos);
+
+  try {
+    const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${cleanUser}?y=last`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.contributions) && data.contributions.length > 0) {
+        return calculateActivityAndContributions(events, repos, data.contributions, data.total?.lastYear);
+      }
+    }
+  } catch (err) {
+    console.warn('Could not fetch external contributions graph, falling back to local computation:', err);
+  }
+
+  return calculateActivityAndContributions(events, repos);
 }
 
 /**

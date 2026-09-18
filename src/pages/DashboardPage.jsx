@@ -19,6 +19,7 @@ import {
   fetchRecentEvents,
   calculateLanguageBreakdown,
   calculateActivityAndContributions,
+  fetchUserContributions,
 } from '../services/githubApi';
 
 export default function DashboardPage({ onNavigate }) {
@@ -72,13 +73,18 @@ export default function DashboardPage({ onNavigate }) {
       const repos = reposRes.data || [];
       const commits = eventsRes.data || [];
       const languages = calculateLanguageBreakdown(repos);
-      const metrics = calculateActivityAndContributions(commits, repos);
+      const metrics = await fetchUserContributions(userToLoad, commits, repos, ownerToken);
 
       const enrichedProfile = {
         ...userRes.data,
         currentStreak: metrics.currentStreak,
         longestStreak: metrics.longestStreak,
         totalCommitsYear: metrics.totalCommitsYear,
+        activeDaysThisYear: metrics.activeDaysThisYear,
+        streakStatus: metrics.streakStatus,
+        streakMessage: metrics.streakMessage,
+        todayCount: metrics.todayCount,
+        yesterdayCount: metrics.yesterdayCount,
       };
 
       setProfileData(enrichedProfile);
