@@ -53,34 +53,41 @@ function isValidGitHubToken(token) {
 }
 
 /**
- * Helper to execute GitHub API fetch requests with automatic 401 Unauthorized fallback
+ * Helper to execute GitHub API fetch requests
  */
-async function githubFetch(url, token = null) {
+async function githubFetch(url, token = null, options = {}) {
+  const method = options.method || 'GET';
   const headers = {
     Accept: 'application/vnd.github.v3+json',
+    ...(options.headers || {}),
   };
 
-  const rawToken = token || import.meta.env?.VITE_GITHUB_PAT || import.meta.env?.VITE_GITHUB_TOKEN;
+  if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const rawToken = token || (typeof localStorage !== 'undefined' ? localStorage.getItem('commitstreak-owner-token') : null) || import.meta.env?.VITE_GITHUB_PAT || import.meta.env?.VITE_GITHUB_TOKEN;
   const hasValidToken = isValidGitHubToken(rawToken);
   if (hasValidToken) {
-    // GitHub supports Authorization: Bearer <token> for personal access tokens & OAuth
     headers.Authorization = `Bearer ${rawToken.trim()}`;
   }
 
-  let response = await fetch(url, { headers });
+  const fetchConfig = {
+    method,
+    headers,
+    ...options,
+    body: (options.body && typeof options.body === 'object' && !(options.body instanceof FormData))
+      ? JSON.stringify(options.body)
+      : options.body,
+  };
 
-  // If request failed with 401 (Bad credentials / expired token), automatically retry without Authorization header
-  if (response.status === 401 && hasValidToken) {
+  let response = await fetch(url, fetchConfig);
+
+  // If GET request failed with 401 (Bad credentials / expired token), retry anonymously
+  if (response.status === 401 && hasValidToken && method === 'GET') {
     console.warn('GitHub token rejected (401 Unauthorized). Retrying anonymously without token...');
-    try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem('commitstreak-owner-token');
-      }
-    } catch (e) {
-      // ignore
-    }
     delete headers.Authorization;
-    response = await fetch(url, { headers });
+    response = await fetch(url, { ...fetchConfig, headers });
   }
 
   return response;
@@ -422,3 +429,346 @@ export function calculateActivityAndContributions(events = [], repos = []) {
     monthlyActivity,
   };
 }
+
+/**
+ * Base64 encode UTF-8 string safely (supports emoji, Unicode, special chars)
+ */
+export function encodeUtf8ToBase64(str) {
+  try {
+    return btoa(
+      encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (match, p1) =>
+        String.fromCharCode('0x' + p1)
+      )
+    );
+  } catch (err) {
+    console.error('Base64 encoding error:', err);
+    return btoa(str);
+  }
+}
+
+/**
+ * Base64 decode UTF-8 string safely
+ */
+export function decodeBase64ToUtf8(base64Str) {
+  try {
+    const clean = base64Str.replace(/\s+/g, '');
+    return decodeURIComponent(
+      atob(clean)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+  } catch (err) {
+    console.error('Base64 decoding error:', err);
+    try {
+      return atob(base64Str.replace(/\s+/g, ''));
+    } catch {
+      return base64Str;
+    }
+  }
+}
+
+/**
+ * Fetch repository contents (directory list or file object)
+ */
+export async function fetchRepoContents(owner, repo, path = '', ref = null, token = null) {
+  if (!owner || !repo) return { data: null, error: 'Owner and repo are required' };
+
+  const cleanPath = path ? path.replace(/^\/+/, '') : '';
+  const query = ref ? `?ref=${encodeURIComponent(ref)}` : '';
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${cleanPath}${query}`;
+
+  try {
+    const response = await githubFetch(url, token);
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => ({}));
+      return {
+        data: null,
+        error: errJson.message || `Failed to fetch contents (${response.status})`,
+        status: response.status,
+      };
+    }
+
+    const data = await response.json();
+    return { data, error: null, status: response.status };
+  } catch (err) {
+    return { data: null, error: err.message };
+  }
+}
+
+/**
+ * Fetch a single file's decoded text content & sha
+ */
+export async function fetchFileContent(owner, repo, path, ref = null, token = null) {
+  if (!owner || !repo || !path) return { content: '', sha: null, error: 'Path required' };
+
+  try {
+    const res = await fetchRepoContents(owner, repo, path, ref, token);
+    if (res.error || !res.data) {
+      return { content: '', sha: null, error: res.error || 'File not found' };
+    }
+
+    if (Array.isArray(res.data)) {
+      return { content: '', sha: null, isDir: true, error: 'Target is a directory, not a file' };
+    }
+
+    let decoded = '';
+    if (res.data.content && res.data.encoding === 'base64') {
+      decoded = decodeBase64ToUtf8(res.data.content);
+    } else if (res.data.download_url) {
+      const rawRes = await fetch(res.data.download_url);
+      decoded = await rawRes.text();
+    }
+
+    return {
+      content: decoded,
+      sha: res.data.sha,
+      size: res.data.size,
+      name: res.data.name,
+      path: res.data.path,
+      htmlUrl: res.data.html_url,
+      downloadUrl: res.data.download_url,
+      error: null,
+    };
+  } catch (err) {
+    return { content: '', sha: null, error: err.message };
+  }
+}
+
+/**
+ * Commit a file change (create or update) directly to GitHub
+ */
+export async function commitFileChange(owner, repo, path, content, message, sha = null, branch = null, token = null) {
+  if (!owner || !repo || !path) {
+    return { success: false, error: 'Owner, repository name, and file path are required.' };
+  }
+
+  const cleanPath = path.replace(/^\/+/, '');
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${cleanPath}`;
+
+  const body = {
+    message: message || (sha ? `Update ${cleanPath}` : `Create ${cleanPath}`),
+    content: encodeUtf8ToBase64(content),
+  };
+
+  if (sha) {
+    body.sha = sha;
+  }
+  if (branch) {
+    body.branch = branch;
+  }
+
+  try {
+    const response = await githubFetch(url, token, {
+      method: 'PUT',
+      body,
+    });
+
+    const resData = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      let errMsg = resData.message || `Commit failed (${response.status})`;
+      if (response.status === 401) {
+        errMsg = 'Invalid or expired GitHub token. Please verify your Personal Access Token in Account Setup.';
+      } else if (response.status === 403) {
+        errMsg = 'Permission denied. Make sure your GitHub token has the "repo" scope enabled to push commits.';
+      } else if (response.status === 404) {
+        errMsg = 'Repository not found or access denied. Ensure token has access to this repository.';
+      } else if (response.status === 409) {
+        errMsg = 'Conflict: The file on GitHub was updated by someone else. Please refresh and try again.';
+      }
+      return { success: false, error: errMsg, status: response.status };
+    }
+
+    return {
+      success: true,
+      commit: resData.commit,
+      content: resData.content,
+      error: null,
+    };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Delete a file in a repository directly on GitHub
+ */
+export async function deleteRepoFile(owner, repo, path, message, sha, branch = null, token = null) {
+  if (!owner || !repo || !path || !sha) {
+    return { success: false, error: 'File SHA and path are required to delete a file.' };
+  }
+
+  const cleanPath = path.replace(/^\/+/, '');
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${cleanPath}`;
+
+  const body = {
+    message: message || `Delete ${cleanPath}`,
+    sha,
+  };
+  if (branch) {
+    body.branch = branch;
+  }
+
+  try {
+    const response = await githubFetch(url, token, {
+      method: 'DELETE',
+      body,
+    });
+
+    const resData = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      let errMsg = resData.message || `File deletion failed (${response.status})`;
+      if (response.status === 403) {
+        errMsg = 'Permission denied. Ensure your GitHub Personal Access Token has "repo" scope.';
+      }
+      return { success: false, error: errMsg };
+    }
+
+    return { success: true, commit: resData.commit, error: null };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Create a new repository on the authenticated GitHub user's account
+ */
+export async function createNewRepo(repoData, token = null) {
+  if (!repoData || !repoData.name) {
+    return { success: false, error: 'Repository name is required.' };
+  }
+
+  const url = `${GITHUB_API_URL}/user/repos`;
+  const body = {
+    name: repoData.name.trim(),
+    description: repoData.description || '',
+    private: Boolean(repoData.isPrivate),
+    auto_init: repoData.autoInit !== undefined ? repoData.autoInit : true,
+  };
+
+  try {
+    const response = await githubFetch(url, token, {
+      method: 'POST',
+      body,
+    });
+
+    const resData = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      let errMsg = resData.message || `Failed to create repository (${response.status})`;
+      if (response.status === 401) {
+        errMsg = 'Personal Access Token required with "repo" scope to create repositories.';
+      } else if (response.status === 422) {
+        errMsg = resData.errors?.[0]?.message || 'A repository with this name already exists.';
+      }
+      return { success: false, error: errMsg };
+    }
+
+    return { success: true, data: resData, error: null };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Update repository details (name, description, visibility, default branch)
+ */
+export async function updateRepoDetails(owner, repo, updateData, token = null) {
+  if (!owner || !repo) {
+    return { success: false, error: 'Owner and repo name required.' };
+  }
+
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}`;
+  const body = {};
+
+  if (updateData.name && updateData.name !== repo) {
+    body.name = updateData.name.trim();
+  }
+  if (updateData.description !== undefined) {
+    body.description = updateData.description;
+  }
+  if (updateData.isPrivate !== undefined) {
+    body.private = Boolean(updateData.isPrivate);
+  }
+  if (updateData.defaultBranch) {
+    body.default_branch = updateData.defaultBranch;
+  }
+
+  try {
+    const response = await githubFetch(url, token, {
+      method: 'PATCH',
+      body,
+    });
+
+    const resData = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return { success: false, error: resData.message || `Failed to update repository (${response.status})` };
+    }
+
+    // If topics provided, update topics separately via topics endpoint
+    if (Array.isArray(updateData.topics)) {
+      try {
+        await githubFetch(`${GITHUB_API_URL}/repos/${owner}/${body.name || repo}/topics`, token, {
+          method: 'PUT',
+          body: { names: updateData.topics.map(t => t.toLowerCase().trim()).filter(Boolean) },
+        });
+      } catch (topicErr) {
+        console.warn('Failed to update topics:', topicErr);
+      }
+    }
+
+    return { success: true, data: resData, error: null };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Delete a repository from GitHub
+ */
+export async function deleteRepo(owner, repo, token = null) {
+  if (!owner || !repo) return { success: false, error: 'Owner and repo name required' };
+
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}`;
+  try {
+    const response = await githubFetch(url, token, {
+      method: 'DELETE',
+    });
+
+    if (response.status === 204 || response.ok) {
+      return { success: true, error: null };
+    }
+
+    const resData = await response.json().catch(() => ({}));
+    let errMsg = resData.message || `Failed to delete repository (${response.status})`;
+    if (response.status === 403) {
+      errMsg = 'Permission denied. Deleting repositories requires a token with "delete_repo" or "repo" scope.';
+    }
+    return { success: false, error: errMsg };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Fetch branches for a repository
+ */
+export async function fetchRepoBranches(owner, repo, token = null) {
+  if (!owner || !repo) return { data: [], error: 'Owner and repo required' };
+
+  const url = `${GITHUB_API_URL}/repos/${owner}/${repo}/branches?per_page=50`;
+  try {
+    const response = await githubFetch(url, token);
+    if (!response.ok) {
+      return { data: [], error: `Failed to fetch branches (${response.status})` };
+    }
+    const data = await response.json();
+    return { data: Array.isArray(data) ? data : [], error: null };
+  } catch (err) {
+    return { data: [], error: err.message };
+  }
+}
+
