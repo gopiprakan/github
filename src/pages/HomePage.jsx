@@ -152,7 +152,7 @@ export default function HomePage({ onNavigate }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Feature 1 */}
           <div className="p-6 rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm hover:shadow-md transition-all">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
@@ -168,6 +168,19 @@ export default function HomePage({ onNavigate }) {
 
           {/* Feature 2 */}
           <div className="p-6 rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm hover:shadow-md transition-all">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center mb-4">
+              <Code className="w-5 h-5" />
+            </div>
+            <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText mb-2">
+              Live File & Repo Editor
+            </h3>
+            <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
+              Browse file trees, edit code, create new files or repositories, and commit changes that reflect immediately on your GitHub account.
+            </p>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="p-6 rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm hover:shadow-md transition-all">
             <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-4">
               <BookOpen className="w-5 h-5" />
             </div>
@@ -179,13 +192,13 @@ export default function HomePage({ onNavigate }) {
             </p>
           </div>
 
-          {/* Feature 3 */}
+          {/* Feature 4 */}
           <div className="p-6 rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm hover:shadow-md transition-all">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-4">
               <BarChart2 className="w-5 h-5" />
             </div>
             <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText mb-2">
-              Language & Activity Analytics
+              Language & Analytics
             </h3>
             <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
               Visualizes language breakdown from your actual repositories, alongside 52-week activity distribution and weekly cadence.
