@@ -6,21 +6,28 @@ export default function ContributionCalendar({ contributions = [] }) {
   const [hoveredCell, setHoveredCell] = useState(null);
   const [selectedYear, setSelectedYear] = useState('Past Year');
 
+  const displayContributions = useMemo(() => {
+    if (!contributions || contributions.length === 0) return [];
+    if (selectedYear === 'Past Year') return contributions;
+    const yearStr = String(selectedYear);
+    return contributions.filter(c => c.date && c.date.startsWith(yearStr));
+  }, [contributions, selectedYear]);
+
   // Split contributions into columns of 7 days (52 or 53 weeks)
   const weeks = useMemo(() => {
-    if (!contributions || contributions.length === 0) return [];
+    if (!displayContributions || displayContributions.length === 0) return [];
     const grouped = [];
     let currentWeek = [];
 
-    contributions.forEach((day, index) => {
+    displayContributions.forEach((day, index) => {
       currentWeek.push(day);
-      if (currentWeek.length === 7 || index === contributions.length - 1) {
+      if (currentWeek.length === 7 || index === displayContributions.length - 1) {
         grouped.push(currentWeek);
         currentWeek = [];
       }
     });
     return grouped;
-  }, [contributions]);
+  }, [displayContributions]);
 
   // Compute month label positions based on first occurrence in weeks
   const monthLabels = useMemo(() => {
@@ -45,8 +52,8 @@ export default function ContributionCalendar({ contributions = [] }) {
   }, [weeks]);
 
   const totalCommitsInPeriod = useMemo(() => {
-    return contributions.reduce((acc, curr) => acc + (curr.count || 0), 0);
-  }, [contributions]);
+    return displayContributions.reduce((acc, curr) => acc + (curr.count || 0), 0);
+  }, [displayContributions]);
 
   // Color mappings for levels 0 to 4 in light and dark mode
   const getCellColor = (level) => {
