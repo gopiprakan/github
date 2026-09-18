@@ -24,12 +24,13 @@ export function AuthProvider({ children }) {
 
   const [ownerToken, setOwnerToken] = useState(() => {
     const raw =
-      localStorage.getItem('commitstreak-owner-token') ||
       import.meta.env?.VITE_GITHUB_PAT ||
-      import.meta.env?.VITE_GITHUB_TOKEN;
+      import.meta.env?.VITE_GITHUB_TOKEN ||
+      localStorage.getItem('commitstreak-owner-token');
     const clean = sanitizeToken(raw);
-    if (localStorage.getItem('commitstreak-owner-token') && !clean) {
-      localStorage.removeItem('commitstreak-owner-token');
+    if (clean) {
+      localStorage.setItem('commitstreak-owner-token', clean);
+      localStorage.setItem('commitstreak-is-auth', 'true');
     }
     return clean;
   });
