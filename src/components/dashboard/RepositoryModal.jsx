@@ -1,9 +1,9 @@
 import React from 'react';
-import { Star, GitFork, BookMarked, ExternalLink, Calendar, Shield, GitCommit, AlertCircle, GitBranch, Check, Code } from 'lucide-react';
+import { Star, GitFork, BookMarked, ExternalLink, Calendar, Shield, GitCommit, AlertCircle, GitBranch, Check, Code, Settings, Edit3 } from 'lucide-react';
 import Modal from '../common/Modal';
 import Badge from '../common/Badge';
 
-export default function RepositoryModal({ repo, isOpen, onClose }) {
+export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, onEditSettings }) {
   if (!repo) return null;
 
   const formatDate = (dateStr) => {
@@ -116,14 +116,37 @@ export default function RepositoryModal({ repo, isOpen, onClose }) {
 
         {/* Footer info & CTA */}
         <div className="pt-4 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="text-xs text-gh-lightMuted dark:text-gh-darkMuted">
-            Direct GitHub sync enabled
-          </span>
-
           <div className="flex items-center gap-2 w-full sm:w-auto">
+            {onEditFiles && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onEditFiles(repo);
+                }}
+                className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm"
+              >
+                <Code className="w-3.5 h-3.5" />
+                <span>Open & Edit Files</span>
+              </button>
+            )}
+            {onEditSettings && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onEditSettings(repo);
+                }}
+                className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard flex items-center gap-1"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                <span>Settings</span>
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="flex-1 sm:flex-none px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard"
+              className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard"
             >
               Close
             </button>
@@ -131,9 +154,10 @@ export default function RepositoryModal({ repo, isOpen, onClose }) {
               href={repo.htmlUrl}
               target="_blank"
               rel="noreferrer"
-              className="flex-1 sm:flex-none px-4 py-2 text-xs font-medium rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1.5 shadow-sm"
+              className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard flex items-center gap-1.5"
             >
-              Open on GitHub <ExternalLink className="w-3.5 h-3.5" />
+              <span>GitHub</span>
+              <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
         </div>
@@ -141,3 +165,4 @@ export default function RepositoryModal({ repo, isOpen, onClose }) {
     </Modal>
   );
 }
+
