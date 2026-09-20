@@ -1,6 +1,7 @@
 import React from 'react';
-import { Flame, Github, Shield, Code2, ExternalLink } from 'lucide-react';
+import { Github, Shield, Code2, ExternalLink } from 'lucide-react';
 import Badge from '../common/Badge';
+import Logo from '../common/Logo';
 
 export default function Footer({ onNavigate }) {
   return (
@@ -9,13 +10,8 @@ export default function Footer({ onNavigate }) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-gh-lightBorder dark:border-gh-darkBorder">
           {/* Col 1: Brand */}
           <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-emerald-500 flex items-center justify-center text-white shadow-sm">
-                <Flame className="w-3.5 h-3.5 fill-white" />
-              </div>
-              <span className="font-bold text-sm text-gh-lightText dark:text-gh-darkText tracking-tight">
-                Commit<span className="text-emerald-500">Streak</span>
-              </span>
+            <div className="flex items-center gap-3">
+              <Logo size="sm" showSubtitle={false} />
               <Badge variant="emerald" size="xs">v1.0 Live</Badge>
             </div>
             <p className="text-xs max-w-md leading-relaxed">

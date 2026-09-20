@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Flame, Github, Menu, X, BookOpen, GitFork, LayoutDashboard, Search, UserCheck } from 'lucide-react';
+import { Github, Menu, X, BookOpen, GitFork, LayoutDashboard, Search, UserCheck } from 'lucide-react';
 import ThemeToggle from '../common/ThemeToggle';
 import Badge from '../common/Badge';
+import Logo from '../common/Logo';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Navbar({ activePage, setActivePage }) {
@@ -35,27 +36,17 @@ export default function Navbar({ activePage, setActivePage }) {
     <header className="sticky top-0 z-40 w-full border-b border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightPanel/90 dark:bg-gh-darkPanel/90 backdrop-blur-md transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          {/* Logo */}
+          {/* Professional Logo */}
           <div className="flex items-center gap-5">
             <button
               onClick={() => handleNavClick('home')}
-              className="flex items-center gap-2 group text-left transition-all"
+              className="group text-left transition-all"
             >
-              <div className="w-8 h-8 rounded-md bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform duration-150">
-                <Flame className="w-4 h-4 fill-white" />
-              </div>
-              <div>
-                <span className="font-bold text-sm tracking-tight text-gh-lightText dark:text-gh-darkText flex items-center gap-1">
-                  Commit<span className="text-emerald-500">Streak</span>
-                </span>
-                <span className="block text-[9px] font-mono text-gh-lightMuted dark:text-gh-darkMuted -mt-0.5">
-                  live github monitor
-                </span>
-              </div>
+              <Logo size="md" showSubtitle={true} />
             </button>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 ml-1">
+            <nav className="hidden md:flex items-center gap-1 ml-2">
               {navItems.map((item) => {
                 const isActive = activePage === item.id;
                 return (
