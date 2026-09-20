@@ -20,7 +20,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={repo.name} maxWidth="max-w-2xl">
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Header description & external CTA */}
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -40,13 +40,13 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
               </Badge>
             )}
           </div>
-          <p className="text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
+          <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
             {repo.description || "Public repository monitored on CommitStreak."}
           </p>
         </div>
 
         {/* Quick stats grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard/50">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 p-3.5 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard/50">
           <div className="space-y-0.5">
             <span className="text-[11px] text-gh-lightMuted dark:text-gh-darkMuted flex items-center gap-1">
               <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> Stars
@@ -85,7 +85,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
               {repo.topics.map((t) => (
                 <span
                   key={t}
-                  className="px-2.5 py-1 text-xs font-mono rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                  className="px-2 py-0.5 text-xs font-mono rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800"
                 >
                   #{t}
                 </span>
@@ -95,7 +95,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
         )}
 
         {/* Repository overview info */}
-        <div className="p-4 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50/50 dark:bg-gh-darkCard/30 space-y-2 text-xs">
+        <div className="p-3 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50/50 dark:bg-gh-darkCard/30 space-y-1.5 text-xs">
           <div className="flex items-center justify-between text-gh-lightMuted dark:text-gh-darkMuted">
             <span className="flex items-center gap-1.5 font-medium">
               <Code className="w-3.5 h-3.5 text-emerald-500" /> Primary Language:
@@ -115,7 +115,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
         </div>
 
         {/* Footer info & CTA */}
-        <div className="pt-4 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="pt-3.5 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2 w-full sm:w-auto">
             {onEditFiles && (
               <button
@@ -123,10 +123,10 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
                   onClose();
                   onEditFiles(repo);
                 }}
-                className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm"
+                className="px-3 py-1.5 text-xs font-semibold rounded-md bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm transition-all duration-150"
               >
                 <Code className="w-3.5 h-3.5" />
-                <span>Open & Edit Files</span>
+                <span>Open Files & Code</span>
               </button>
             )}
             {onEditSettings && (
@@ -135,7 +135,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
                   onClose();
                   onEditSettings(repo);
                 }}
-                className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard flex items-center gap-1"
+                className="px-3 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard flex items-center gap-1 transition-all duration-150"
               >
                 <Settings className="w-3.5 h-3.5" />
                 <span>Settings</span>
@@ -146,7 +146,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
             <button
               onClick={onClose}
-              className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard"
+              className="px-3 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-all duration-150"
             >
               Close
             </button>
@@ -154,7 +154,7 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
               href={repo.htmlUrl}
               target="_blank"
               rel="noreferrer"
-              className="px-3 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard flex items-center gap-1.5"
+              className="px-3 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard flex items-center gap-1.5 transition-all duration-150"
             >
               <span>GitHub</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -165,4 +165,3 @@ export default function RepositoryModal({ repo, isOpen, onClose, onEditFiles, on
     </Modal>
   );
 }
-

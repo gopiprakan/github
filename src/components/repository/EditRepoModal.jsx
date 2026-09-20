@@ -130,16 +130,16 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
       title={`Repository Settings — ${repo.name}`}
       maxWidth="max-w-lg"
     >
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         {!ownerToken && (
-          <div className="p-3.5 rounded-xl border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 flex items-center justify-between gap-3 text-xs">
+          <div className="p-3 rounded-md border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 flex items-center justify-between gap-3 text-xs">
             <span className="text-amber-800 dark:text-amber-300">
-              Personal Access Token with <code className="font-mono font-bold">repo</code> scope required to modify settings.
+              Personal Access Token with <code className="font-mono font-bold">repo</code> scope required.
             </span>
             <button
               type="button"
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium shrink-0"
+              className="px-2.5 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-white font-medium shrink-0 transition-all duration-150"
             >
               Connect Token
             </button>
@@ -148,7 +148,7 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
 
         {feedback && (
           <div
-            className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+            className={`p-2.5 rounded-md text-xs flex items-center gap-2 ${
               feedback.type === 'success'
                 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                 : 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800'
@@ -163,10 +163,10 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
           </div>
         )}
 
-        <form onSubmit={handleSave} className="space-y-4">
+        <form onSubmit={handleSave} className="space-y-3.5">
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">
+            <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1">
               Description
             </label>
             <textarea
@@ -174,26 +174,26 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What does this repository do?"
-              className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+              className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-all duration-150"
             />
           </div>
 
           {/* Topics / Tags */}
           <div>
-            <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">
+            <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1">
               Topics & Tags
             </label>
-            <div className="flex flex-wrap gap-1.5 mb-2">
+            <div className="flex flex-wrap gap-1 mb-2">
               {topics.map((t) => (
                 <span
                   key={t}
-                  className="px-2 py-0.5 text-xs font-mono rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1"
+                  className="px-2 py-0.5 text-xs font-mono rounded bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800 flex items-center gap-1"
                 >
                   #{t}
                   <button
                     type="button"
                     onClick={() => handleRemoveTopic(t)}
-                    className="hover:text-red-500"
+                    className="hover:text-red-500 transition-colors duration-150"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -213,12 +213,12 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
                     handleAddTopic(e);
                   }
                 }}
-                className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="flex-1 px-2.5 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-150"
               />
               <button
                 type="button"
                 onClick={handleAddTopic}
-                className="px-3 py-1.5 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText"
+                className="px-3 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText transition-all duration-150"
               >
                 Add
               </button>
@@ -227,14 +227,14 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
 
           {/* Visibility Toggle */}
           <div>
-            <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-2">
+            <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">
               Visibility
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => setIsPrivate(false)}
-                className={`p-2.5 rounded-xl border text-xs text-left ${
+                className={`p-2 rounded-md border text-xs text-left transition-all duration-150 ${
                   !isPrivate
                     ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold ring-1 ring-emerald-500'
                     : 'border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightMuted'
@@ -245,7 +245,7 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
               <button
                 type="button"
                 onClick={() => setIsPrivate(true)}
-                className={`p-2.5 rounded-xl border text-xs text-left ${
+                className={`p-2 rounded-md border text-xs text-left transition-all duration-150 ${
                   isPrivate
                     ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold ring-1 ring-emerald-500'
                     : 'border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightMuted'
@@ -261,14 +261,14 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard"
+              className="px-3.5 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-all duration-150"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm transition-colors"
+              className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm transition-all duration-150"
             >
               {isSubmitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               <span>Save Changes</span>
@@ -277,25 +277,25 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
         </form>
 
         {/* Danger Zone: Delete Repository */}
-        <div className="pt-4 border-t border-red-200 dark:border-red-950/80">
+        <div className="pt-3 border-t border-red-200 dark:border-red-950/80">
           {!isDeleting ? (
-            <div className="p-3 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 flex items-center justify-between">
+            <div className="p-2.5 rounded-md border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 flex items-center justify-between">
               <div>
                 <h5 className="text-xs font-semibold text-red-700 dark:text-red-400">Delete Repository</h5>
-                <p className="text-[11px] text-gh-lightMuted dark:text-gh-darkMuted">Permanently remove this repository from GitHub.</p>
+                <p className="text-[10px] text-gh-lightMuted dark:text-gh-darkMuted">Permanently remove this repo from GitHub.</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsDeleting(true)}
-                className="px-3 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-300 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-xl transition-colors"
+                className="px-2.5 py-1 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-300 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-md transition-all duration-150"
               >
                 Delete
               </button>
             </div>
           ) : (
-            <div className="p-3.5 rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40 space-y-3">
+            <div className="p-3 rounded-md border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40 space-y-2.5">
               <h5 className="text-xs font-bold text-red-800 dark:text-red-300 flex items-center gap-1.5">
-                <Trash2 className="w-4 h-4" /> Are you absolutely sure?
+                <Trash2 className="w-3.5 h-3.5" /> Are you absolutely sure?
               </h5>
               <p className="text-xs text-red-700 dark:text-red-300">
                 Please type <strong className="font-mono">{repo.name}</strong> to confirm deletion.
@@ -305,13 +305,13 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
                 placeholder={repo.name}
                 value={confirmName}
                 onChange={(e) => setConfirmName(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs rounded-xl border border-red-300 dark:border-red-800 bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none"
+                className="w-full px-2.5 py-1 text-xs rounded-md border border-red-300 dark:border-red-800 bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none transition-all duration-150"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsDeleting(false)}
-                  className="px-3 py-1.5 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText"
+                  className="px-2.5 py-1 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText transition-all duration-150"
                 >
                   Cancel
                 </button>
@@ -319,7 +319,7 @@ export default function EditRepoModal({ repo, isOpen, onClose, onRepoUpdated, on
                   type="button"
                   onClick={handleDelete}
                   disabled={confirmName !== repo.name || isSubmitting}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-xl text-white flex items-center gap-1.5 ${
+                  className={`px-2.5 py-1 text-xs font-semibold rounded-md text-white flex items-center gap-1.5 transition-all duration-150 ${
                     confirmName === repo.name && !isSubmitting
                       ? 'bg-red-600 hover:bg-red-700'
                       : 'bg-red-400 cursor-not-allowed opacity-50'

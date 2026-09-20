@@ -64,16 +64,16 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
   const [selectedBranch, setSelectedBranch] = useState(repo?.defaultBranch || 'main');
 
   // File Editor state
-  const [activeFile, setActiveFile] = useState(null); // { path, name, sha, size }
+  const [activeFile, setActiveFile] = useState(null);
   const [fileContent, setFileContent] = useState('');
   const [originalContent, setOriginalContent] = useState('');
   const [loadingFile, setLoadingFile] = useState(false);
-  const [previewMode, setPreviewMode] = useState(false); // For Markdown / HTML preview
+  const [previewMode, setPreviewMode] = useState(false);
 
   // Commit state
   const [commitMessage, setCommitMessage] = useState('');
   const [isCommitting, setIsCommitting] = useState(false);
-  const [commitFeedback, setCommitFeedback] = useState(null); // { type: 'success'|'error', message, commitUrl }
+  const [commitFeedback, setCommitFeedback] = useState(null);
 
   // New File modal/flow
   const [isCreatingFile, setIsCreatingFile] = useState(false);
@@ -116,7 +116,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     try {
       const res = await fetchRepoContents(owner, repo.name, path, selectedBranch, ownerToken);
       if (res.data && Array.isArray(res.data)) {
-        // Sort folders first, then files alphabetically
         const sorted = [...res.data].sort((a, b) => {
           if (a.type === 'dir' && b.type !== 'dir') return -1;
           if (a.type !== 'dir' && b.type === 'dir') return 1;
@@ -173,14 +172,12 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     }
   };
 
-  // Navigate into directory
   const handleNavigateDir = (dirPath) => {
     setCurrentPath(dirPath);
     setActiveFile(null);
     setCommitFeedback(null);
   };
 
-  // Navigate up one directory level
   const handleNavigateUp = () => {
     if (!currentPath) return;
     const parts = currentPath.split('/').filter(Boolean);
@@ -190,7 +187,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     setCommitFeedback(null);
   };
 
-  // Commit file edits directly to GitHub
   const handleCommitFile = async (e) => {
     e?.preventDefault();
     if (!activeFile || !repo) return;
@@ -198,7 +194,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     if (!ownerToken) {
       setCommitFeedback({
         type: 'error',
-        message: 'A GitHub Personal Access Token is required to push commits to GitHub. Click "Connect Token" below.',
+        message: 'A GitHub Personal Access Token is required to push commits to GitHub.',
       });
       return;
     }
@@ -233,7 +229,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
           commitUrl,
         });
 
-        // Update SHA with new file SHA returned by GitHub
         if (res.content?.sha) {
           setActiveFile(prev => ({ ...prev, sha: res.content.sha }));
         }
@@ -253,7 +248,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     }
   };
 
-  // Create new file
   const handleCreateNewFile = async (e) => {
     e.preventDefault();
     if (!newFilePath.trim() || !repo) return;
@@ -285,7 +279,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
         fullPath,
         initialContent,
         message,
-        null, // null sha for new file
+        null,
         selectedBranch,
         ownerToken
       );
@@ -299,7 +293,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
           commitUrl: `https://github.com/${owner}/${repo.name}/blob/${selectedBranch}/${fullPath}`,
         });
 
-        // Open newly created file in editor
         setActiveFile({
           path: fullPath,
           name: fileName,
@@ -322,7 +315,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     }
   };
 
-  // Delete file
   const handleDeleteFile = async () => {
     if (!activeFile || !repo) return;
 
@@ -371,7 +363,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     }
   };
 
-  // Handle Tab key inside textarea
   const handleKeyDown = (e) => {
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -397,33 +388,33 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Repository Code & File Editor — ${repo.name}`}
+      title={`Code & File Editor — ${repo.name}`}
       maxWidth="max-w-6xl"
     >
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         {/* Token Write Status / Warning Banner */}
         {!ownerToken ? (
-          <div className="p-3.5 rounded-xl border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="p-3 rounded-md border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <span>
-                <strong>Read-Only Mode:</strong> To commit edits, create files, or modify this repo directly on GitHub, connect a Personal Access Token with <code className="font-mono font-bold">repo</code> scope.
+                <strong>Read-Only Mode:</strong> To commit edits or modify files directly on GitHub, connect a PAT with <code className="font-mono font-bold">repo</code> scope.
               </span>
             </div>
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium flex items-center gap-1.5 shrink-0 transition-colors"
+              className="px-2.5 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-white font-medium flex items-center gap-1.5 shrink-0 transition-all duration-150"
             >
-              <Key className="w-3.5 h-3.5" /> Connect Token
+              <Key className="w-3 h-3" /> Connect Token
             </button>
           </div>
         ) : (
-          <div className="p-2.5 rounded-xl border border-emerald-300/80 dark:border-emerald-800/60 bg-emerald-50/50 dark:bg-emerald-950/30 flex items-center justify-between text-[11px] text-emerald-800 dark:text-emerald-300">
+          <div className="p-2.5 rounded-md border border-emerald-300/80 dark:border-emerald-800/60 bg-emerald-50/50 dark:bg-emerald-950/30 flex items-center justify-between text-[11px] text-emerald-800 dark:text-emerald-300">
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-              GitHub Live Sync Active — Edits made here directly commit to GitHub as <strong className="font-mono">@{monitoredUsername}</strong>.
+              GitHub Live Sync Active — Edits commit directly to GitHub as <strong className="font-mono">@{monitoredUsername}</strong>.
             </span>
-            <span className="font-mono text-[10px] bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded-md">
+            <span className="font-mono text-[10px] bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.2 rounded">
               Branch: {selectedBranch}
             </span>
           </div>
@@ -432,7 +423,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
         {/* Feedback alert */}
         {commitFeedback && (
           <div
-            className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 ${
+            className={`p-2.5 rounded-md text-xs flex items-center justify-between gap-2 ${
               commitFeedback.type === 'success'
                 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                 : 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800'
@@ -451,7 +442,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 href={commitFeedback.commitUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium flex items-center gap-1 shrink-0 text-[11px]"
+                className="px-2 py-0.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium flex items-center gap-1 shrink-0 text-[11px] transition-all duration-150"
               >
                 <span>View on GitHub</span>
                 <ExternalLink className="w-3 h-3" />
@@ -461,12 +452,12 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
         )}
 
         {/* Header Bar: Branch selector, Breadcrumbs, Action buttons */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 p-2.5 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard">
           {/* Breadcrumbs & Navigation */}
           <div className="flex items-center gap-1 text-xs font-mono flex-wrap overflow-x-auto">
             <button
               onClick={() => handleNavigateDir('')}
-              className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+              className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 transition-colors duration-150"
             >
               {repo.name}
             </button>
@@ -477,7 +468,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                   <ChevronRight className="w-3.5 h-3.5 text-gh-lightMuted dark:text-gh-darkMuted shrink-0" />
                   <button
                     onClick={() => handleNavigateDir(crumbPath)}
-                    className="text-gh-lightText dark:text-gh-darkText hover:text-emerald-500 hover:underline"
+                    className="text-gh-lightText dark:text-gh-darkText hover:text-emerald-500 hover:underline transition-colors duration-150"
                   >
                     {crumb}
                   </button>
@@ -491,7 +482,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                   {activeFile.name}
                 </span>
                 {isModified && (
-                  <span className="ml-1.5 px-1.5 py-0.2 rounded text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800">
+                  <span className="ml-1 px-1.5 py-0.2 rounded text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-800">
                     ● modified
                   </span>
                 )}
@@ -501,8 +492,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
 
           {/* Branch selector & Actions */}
           <div className="flex items-center gap-2">
-            {/* Branch dropdown */}
-            <div className="flex items-center gap-1 bg-white dark:bg-gh-darkPanel border border-gh-lightBorder dark:border-gh-darkBorder px-2.5 py-1 rounded-xl text-xs font-mono">
+            <div className="flex items-center gap-1 bg-white dark:bg-gh-darkPanel border border-gh-lightBorder dark:border-gh-darkBorder px-2 py-1 rounded-md text-xs font-mono">
               <GitBranch className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <select
                 value={selectedBranch}
@@ -515,7 +505,6 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
               </select>
             </div>
 
-            {/* Refresh */}
             <button
               onClick={() => {
                 if (activeFile) {
@@ -525,15 +514,14 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 }
               }}
               title="Refresh files"
-              className="p-1.5 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel hover:bg-gray-100 dark:hover:bg-gh-darkCard text-gh-lightMuted dark:text-gh-darkMuted"
+              className="p-1 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel hover:bg-gray-100 dark:hover:bg-gh-darkCard text-gh-lightMuted dark:text-gh-darkMuted transition-all duration-150"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
 
-            {/* New File Button */}
             <button
               onClick={() => setIsCreatingFile(true)}
-              className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center gap-1 shadow-sm transition-colors"
+              className="px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center gap-1 shadow-sm transition-all duration-150"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>New File</span>
@@ -542,14 +530,14 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
         </div>
 
         {/* Main Explorer + Editor Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 min-h-[460px] max-h-[550px]">
-          {/* Left: Directory & Files Tree (4 cols) */}
-          <div className="md:col-span-4 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-3 flex flex-col justify-between overflow-hidden">
-            <div className="space-y-1 overflow-y-auto flex-1 pr-1">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 min-h-[460px] max-h-[550px]">
+          {/* Left: Directory & Files Tree */}
+          <div className="md:col-span-4 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-2.5 flex flex-col justify-between overflow-hidden">
+            <div className="space-y-0.5 overflow-y-auto flex-1 pr-1">
               {currentPath && (
                 <button
                   onClick={handleNavigateUp}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-mono text-gh-lightMuted dark:text-gh-darkMuted hover:bg-gray-100 dark:hover:bg-gh-darkCard text-left transition-colors"
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs font-mono text-gh-lightMuted dark:text-gh-darkMuted hover:bg-gray-100 dark:hover:bg-gh-darkCard text-left transition-colors duration-150"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>.. (back up)</span>
@@ -580,7 +568,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                           handleOpenFile(item);
                         }
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-left transition-all ${
+                      className={`w-full flex items-center justify-between px-2 py-1.5 rounded-md text-xs text-left transition-all duration-150 ${
                         isSelected
                           ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-300 dark:border-emerald-800'
                           : 'hover:bg-gray-100 dark:hover:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText'
@@ -608,19 +596,19 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 href={`https://github.com/${repo.owner?.login || monitoredUsername}/${repo.name}/tree/${selectedBranch}/${currentPath}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                className="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 transition-colors duration-150"
               >
                 <span>GitHub Tree</span> <ExternalLink className="w-3 h-3" />
               </a>
             </div>
           </div>
 
-          {/* Right: Code Editor & Preview (8 cols) */}
-          <div className="md:col-span-8 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel flex flex-col overflow-hidden">
+          {/* Right: Code Editor & Preview */}
+          <div className="md:col-span-8 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel flex flex-col overflow-hidden">
             {activeFile ? (
               <>
                 {/* Editor Header Bar */}
-                <div className="p-2.5 border-b border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50/70 dark:bg-gh-darkCard/50 flex items-center justify-between gap-2">
+                <div className="p-2 border-b border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50/70 dark:bg-gh-darkCard/50 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="font-mono text-xs font-semibold text-gh-lightText dark:text-gh-darkText truncate">
                       {activeFile.name}
@@ -630,19 +618,19 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1">
                     {/* Preview toggle for Markdown */}
                     {isMarkdown && (
                       <button
                         onClick={() => setPreviewMode(!previewMode)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors ${
+                        className={`px-2 py-0.5 rounded-md text-xs font-medium flex items-center gap-1 transition-all duration-150 ${
                           previewMode
                             ? 'bg-emerald-600 text-white'
                             : 'bg-white dark:bg-gh-darkPanel border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText'
                         }`}
                       >
-                        {previewMode ? <Edit3 className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                        <span>{previewMode ? 'Edit Code' : 'Preview'}</span>
+                        {previewMode ? <Edit3 className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                        <span>{previewMode ? 'Edit' : 'Preview'}</span>
                       </button>
                     )}
 
@@ -653,7 +641,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                         setIsDeletingFile(true);
                       }}
                       title="Delete this file from GitHub"
-                      className="p-1.5 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border border-transparent hover:border-red-200 dark:hover:border-red-900 transition-colors"
+                      className="p-1 rounded-md text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border border-transparent hover:border-red-200 dark:hover:border-red-900 transition-all duration-150"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -663,7 +651,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                       target="_blank"
                       rel="noreferrer"
                       title="View file on GitHub"
-                      className="p-1.5 rounded-lg text-gh-lightMuted dark:text-gh-darkMuted hover:bg-gray-100 dark:hover:bg-gh-darkCard border border-gh-lightBorder dark:border-gh-darkBorder"
+                      className="p-1 rounded-md text-gh-lightMuted dark:text-gh-darkMuted hover:bg-gray-100 dark:hover:bg-gh-darkCard border border-gh-lightBorder dark:border-gh-darkBorder transition-all duration-150"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
@@ -678,7 +666,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                       <span>Loading file content...</span>
                     </div>
                   ) : previewMode && isMarkdown ? (
-                    <div className="prose dark:prose-invert max-w-none text-xs p-3 font-sans leading-relaxed whitespace-pre-wrap">
+                    <div className="prose dark:prose-invert max-w-none text-xs p-2 font-sans leading-relaxed whitespace-pre-wrap">
                       {fileContent || <span className="italic text-gh-lightMuted">File is empty.</span>}
                     </div>
                   ) : (
@@ -697,7 +685,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 {/* Commit Action Bar */}
                 <form
                   onSubmit={handleCommitFile}
-                  className="p-3 border-t border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard flex flex-col sm:flex-row items-center gap-2"
+                  className="p-2.5 border-t border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard flex flex-col sm:flex-row items-center gap-2"
                 >
                   <div className="relative flex-1 w-full">
                     <input
@@ -705,14 +693,14 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                       placeholder="Commit message (e.g. Update README.md)"
                       value={commitMessage}
                       onChange={(e) => setCommitMessage(e.target.value)}
-                      className="w-full pl-3 pr-3 py-1.5 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+                      className="w-full pl-3 pr-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isCommitting || !isModified}
-                    className={`w-full sm:w-auto px-4 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shrink-0 ${
+                    className={`w-full sm:w-auto px-3.5 py-1.5 rounded-md text-xs font-semibold flex items-center justify-center gap-1.5 transition-all duration-150 shrink-0 ${
                       isModified && !isCommitting
                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
                         : 'bg-gray-200 dark:bg-gh-darkCard text-gh-lightMuted dark:text-gh-darkMuted cursor-not-allowed opacity-60'
@@ -733,8 +721,8 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 </form>
               </>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-3">
-                <Code className="w-12 h-12 text-emerald-500/40" />
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-2.5">
+                <Code className="w-10 h-10 text-emerald-500/40" />
                 <h4 className="text-sm font-semibold text-gh-lightText dark:text-gh-darkText">
                   Select a File to View & Edit
                 </h4>
@@ -743,7 +731,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 </p>
                 <button
                   onClick={() => setIsCreatingFile(true)}
-                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center gap-1.5 transition-colors"
+                  className="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center gap-1.5 transition-all duration-150"
                 >
                   <Plus className="w-3.5 h-3.5" /> Create New File
                 </button>
@@ -754,14 +742,14 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
 
         {/* Modal: Create New File */}
         {isCreatingFile && (
-          <div className="p-4 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/30 space-y-3">
+          <div className="p-3 rounded-md border border-emerald-300 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-950/30 space-y-2.5 animate-fade-in">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
                 <FolderPlus className="w-4 h-4" /> Create New File in Repository
               </h4>
               <button
                 onClick={() => setIsCreatingFile(false)}
-                className="text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText"
+                className="text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText transition-colors duration-150"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -774,12 +762,12 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 value={newFilePath}
                 onChange={(e) => setNewFilePath(e.target.value)}
                 autoFocus
-                className="flex-1 px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="flex-1 px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-150"
               />
               <button
                 type="submit"
                 disabled={isCommitting || !newFilePath.trim()}
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1.5 shrink-0 transition-colors"
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1.5 shrink-0 transition-all duration-150"
               >
                 {isCommitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                 <span>Create & Commit</span>
@@ -790,20 +778,20 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
 
         {/* Modal: Delete File confirmation */}
         {isDeletingFile && activeFile && (
-          <div className="p-4 rounded-xl border border-red-300 dark:border-red-800 bg-red-50/40 dark:bg-red-950/30 space-y-3">
+          <div className="p-3 rounded-md border border-red-300 dark:border-red-800 bg-red-50/40 dark:bg-red-950/30 space-y-2.5 animate-fade-in">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-red-800 dark:text-red-300 flex items-center gap-1.5">
                 <Trash2 className="w-4 h-4" /> Confirm File Deletion on GitHub
               </h4>
               <button
                 onClick={() => setIsDeletingFile(false)}
-                className="text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText"
+                className="text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText transition-colors duration-150"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <p className="text-xs text-red-700 dark:text-red-300">
-              Are you sure you want to delete <strong className="font-mono">{activeFile.path}</strong> from the <strong className="font-mono">{selectedBranch}</strong> branch? This will create a delete commit on GitHub immediately.
+              Are you sure you want to delete <strong className="font-mono">{activeFile.path}</strong> from the <strong className="font-mono">{selectedBranch}</strong> branch?
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <input
@@ -811,13 +799,13 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                 placeholder={`Delete ${activeFile.name}`}
                 value={deleteCommitMsg}
                 onChange={(e) => setDeleteCommitMsg(e.target.value)}
-                className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none"
+                className="flex-1 px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none transition-all duration-150"
               />
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setIsDeletingFile(false)}
-                  className="px-3 py-1.5 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText transition-all duration-150"
                 >
                   Cancel
                 </button>
@@ -825,7 +813,7 @@ export default function RepoFileManagerModal({ repo, isOpen, onClose, onRepoUpda
                   type="button"
                   onClick={handleDeleteFile}
                   disabled={isCommitting}
-                  className="px-4 py-1.5 text-xs font-semibold rounded-xl bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-1.5 transition-colors"
+                  className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-1.5 transition-all duration-150"
                 >
                   {isCommitting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                   <span>Confirm Delete</span>

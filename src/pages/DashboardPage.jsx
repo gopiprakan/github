@@ -124,35 +124,35 @@ export default function DashboardPage({ onNavigate }) {
   // State 1: No user configured yet (New User Welcome State)
   if (!monitoredUsername && !loading) {
     return (
-      <div className="py-12 max-w-3xl mx-auto px-4 sm:px-6">
-        <div className="rounded-3xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-8 sm:p-12 shadow-elevated dark:shadow-elevated-dark text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
-            <Github className="w-8 h-8" />
+      <div className="py-10 max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="rounded-lg border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 sm:p-10 shadow-subtle text-center space-y-5">
+          <div className="w-12 h-12 rounded-md bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto">
+            <Github className="w-6 h-6" />
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gh-lightText dark:text-gh-darkText">
+          <div className="space-y-1.5">
+            <h2 className="text-xl sm:text-2xl font-bold text-gh-lightText dark:text-gh-darkText">
               Enter GitHub Account to Monitor
             </h2>
-            <p className="text-sm text-gh-lightMuted dark:text-gh-darkMuted max-w-lg mx-auto">
+            <p className="text-xs sm:text-sm text-gh-lightMuted dark:text-gh-darkMuted max-w-md mx-auto">
               Please enter your GitHub username or connect your GitHub account to see live repositories, recent commit streams, streaks, and analytics.
             </p>
           </div>
 
           {/* Input Form */}
-          <form onSubmit={handleSearchSubmit} className="max-w-md mx-auto">
-            <div className="flex items-center gap-2 p-1.5 rounded-2xl border-2 border-emerald-500/50 bg-gh-lightBg dark:bg-gh-darkCard focus-within:border-emerald-500 transition-all">
-              <span className="pl-3 text-gh-lightMuted dark:text-gh-darkMuted font-mono text-sm">@</span>
+          <form onSubmit={handleSearchSubmit} className="max-w-sm mx-auto">
+            <div className="flex items-center gap-2 p-1 rounded-md border-2 border-emerald-500/50 bg-gh-lightBg dark:bg-gh-darkCard focus-within:border-emerald-500 transition-all duration-150">
+              <span className="pl-2.5 text-gh-lightMuted dark:text-gh-darkMuted font-mono text-xs">@</span>
               <input
                 type="text"
                 value={searchHandle}
                 onChange={(e) => setSearchHandle(e.target.value)}
-                placeholder="e.g. gopiprakan, torvalds, etc."
-                className="flex-1 px-2 py-2 text-sm bg-transparent text-gh-lightText dark:text-gh-darkText placeholder:text-gh-lightMuted focus:outline-none font-medium"
+                placeholder="e.g. gopiprakan, torvalds..."
+                className="flex-1 px-1.5 py-1.5 text-xs bg-transparent text-gh-lightText dark:text-gh-darkText placeholder:text-gh-lightMuted focus:outline-none font-mono font-medium"
               />
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center gap-1.5 transition-all"
+                className="px-3.5 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center gap-1 transition-all duration-150"
               >
                 <span>Load Profile</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -160,10 +160,10 @@ export default function DashboardPage({ onNavigate }) {
             </div>
           </form>
 
-          <div className="pt-4 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="pt-3 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-center gap-2.5">
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              className="w-full sm:w-auto px-4 py-2 rounded-md bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium text-xs flex items-center justify-center gap-2 hover:opacity-90 transition-all duration-150"
             >
               <Github className="w-4 h-4" />
               <span>Connect with GitHub OAuth</span>
@@ -177,66 +177,66 @@ export default function DashboardPage({ onNavigate }) {
   // State 2: Loading State
   if (loading) {
     return (
-      <div className="space-y-6 py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="space-y-4 py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-48 rounded-xl" />
-          <Skeleton className="h-8 w-32 rounded-xl" />
+          <Skeleton className="h-7 w-40 rounded-md" />
+          <Skeleton className="h-7 w-28 rounded-md" />
         </div>
-        <Skeleton className="h-40 w-full rounded-2xl" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Skeleton className="h-28 rounded-2xl" count={4} />
+        <Skeleton className="h-32 w-full rounded-lg" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <Skeleton className="h-24 rounded-lg" count={4} />
         </div>
-        <Skeleton className="h-64 rounded-2xl" />
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Skeleton className="h-72 rounded-2xl lg:col-span-2" />
-          <Skeleton className="h-72 rounded-2xl" />
+        <Skeleton className="h-56 rounded-lg" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Skeleton className="h-64 rounded-lg lg:col-span-2" />
+          <Skeleton className="h-64 rounded-lg" />
         </div>
       </div>
     );
   }
 
-  // State 3: Error State (e.g. User not found, rate limit, etc.)
+  // State 3: Error State
   if (fetchError || !profileData) {
     const isNotFound = fetchError && fetchError.toLowerCase().includes('not found');
     const isRateLimit = fetchError && fetchError.toLowerCase().includes('rate limit');
 
     return (
-      <div className="py-12 max-w-xl mx-auto px-4">
-        <div className="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-6 sm:p-8 text-center space-y-4 shadow-sm">
-          <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
-          <h3 className="text-lg font-bold text-red-700 dark:text-red-400">
+      <div className="py-10 max-w-lg mx-auto px-4">
+        <div className="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-5 sm:p-7 text-center space-y-3.5 shadow-sm">
+          <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
+          <h3 className="text-base font-bold text-red-700 dark:text-red-400">
             {isNotFound ? 'User Profile Not Found' : isRateLimit ? 'GitHub API Rate Limit Reached' : 'Unable to Load Profile'}
           </h3>
-          <p className="text-xs sm:text-sm text-red-600 dark:text-red-300 max-w-md mx-auto">
+          <p className="text-xs text-red-600 dark:text-red-300 max-w-md mx-auto leading-relaxed">
             {fetchError || `Could not find any public GitHub user named "${monitoredUsername}".`}
           </p>
 
-          <form onSubmit={handleSearchSubmit} className="max-w-xs mx-auto pt-2 flex gap-2">
+          <form onSubmit={handleSearchSubmit} className="max-w-xs mx-auto pt-1 flex gap-2">
             <input
               type="text"
               placeholder="Enter GitHub username..."
               value={searchHandle}
               onChange={(e) => setSearchHandle(e.target.value)}
-              className="flex-1 px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+              className="flex-1 px-2.5 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
             />
             <button
               type="submit"
-              className="px-4 py-2 text-xs font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+              className="px-3.5 py-1.5 text-xs font-semibold rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-150"
             >
               Search
             </button>
           </form>
 
-          <div className="flex items-center justify-center gap-3 pt-2">
+          <div className="flex items-center justify-center gap-2.5 pt-1">
             <button
               onClick={() => loadData(monitoredUsername)}
-              className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkPanel flex items-center gap-1.5 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkPanel flex items-center gap-1.5 transition-all duration-150"
             >
               <RefreshCw className="w-3.5 h-3.5" /> Retry
             </button>
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-4 py-2 text-xs font-medium rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+              className="px-3 py-1.5 text-xs font-medium rounded-md bg-emerald-600 hover:bg-emerald-700 text-white transition-all duration-150"
             >
               Account Setup
             </button>
@@ -248,34 +248,34 @@ export default function DashboardPage({ onNavigate }) {
 
   // State 4: Active Dashboard View with Real Data
   return (
-    <div className="space-y-6 py-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="space-y-4 py-5 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Top search & switch user bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3 rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm">
-        <div className="flex items-center gap-2 text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 p-2.5 rounded-lg border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-sm">
+        <div className="flex items-center gap-2 text-xs text-gh-lightMuted dark:text-gh-darkMuted pl-1">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>
-            Active live monitor: <strong className="text-gh-lightText dark:text-gh-darkText font-mono">@{profileData.username}</strong>
+            Active monitor: <strong className="text-gh-lightText dark:text-gh-darkText font-mono">@{profileData.username}</strong>
           </span>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <form onSubmit={handleSearchSubmit} className="flex-1 sm:w-64 relative">
+          <form onSubmit={handleSearchSubmit} className="flex-1 sm:w-56 relative">
             <input
               type="text"
               placeholder="Switch GitHub user..."
               value={searchHandle}
               onChange={(e) => setSearchHandle(e.target.value)}
-              className="w-full pl-7 pr-3 py-1.5 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono"
+              className="w-full pl-7 pr-3 py-1 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkCard text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
             />
-            <Search className="w-3.5 h-3.5 text-gh-lightMuted absolute left-2.5 top-2.5 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-gh-lightMuted absolute left-2 top-2 pointer-events-none" />
           </form>
 
           <button
             onClick={() => loadData(monitoredUsername)}
             title="Refresh GitHub data"
-            className="p-1.5 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightMuted dark:text-gh-darkMuted hover:text-emerald-500 transition-colors"
+            className="p-1 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder hover:bg-gray-50 dark:hover:bg-gh-darkCard text-gh-lightMuted dark:text-gh-darkMuted hover:text-emerald-500 transition-all duration-150"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -296,7 +296,7 @@ export default function DashboardPage({ onNavigate }) {
       )}
 
       {/* Analytics Charts & Language Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           {activityMetrics && (
             <CommitActivityChart
@@ -311,27 +311,27 @@ export default function DashboardPage({ onNavigate }) {
       </div>
 
       {/* Recent Commits Feed & Top Repositories Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
               <GitFork className="w-4 h-4 text-emerald-500" />
               Public Repositories ({reposData.length})
             </h3>
             <button
               onClick={() => onNavigate('repositories')}
-              className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+              className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1 transition-colors duration-150"
             >
-              View all repos <ArrowRight className="w-3 h-3" />
+              View all <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
           {reposData.length === 0 ? (
-            <div className="p-8 rounded-2xl border border-dashed border-gh-lightBorder dark:border-gh-darkBorder text-center text-xs text-gh-lightMuted dark:text-gh-darkMuted">
+            <div className="p-6 rounded-lg border border-dashed border-gh-lightBorder dark:border-gh-darkBorder text-center text-xs text-gh-lightMuted dark:text-gh-darkMuted">
               No public repositories found for @{profileData.username}.
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {reposData.slice(0, 4).map((repo) => (
                 <RepositoryCard
                   key={repo.id}

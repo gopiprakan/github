@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Github, Key, CheckCircle2, AlertCircle, LogOut, ArrowRight, UserCheck, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { Github, Key, CheckCircle2, AlertCircle, LogOut, ArrowRight, UserCheck, ShieldCheck, Sparkles, X, ExternalLink } from 'lucide-react';
 import Modal from '../common/Modal';
 import { useAuth } from '../../context/AuthContext';
 
@@ -87,33 +87,33 @@ export default function ConnectGitHubModal() {
       title="GitHub Account Setup"
       maxWidth="max-w-lg"
     >
-      <div className="space-y-5">
+      <div className="space-y-4">
         {/* Status banner */}
-        <div className="p-3.5 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard flex items-start gap-3">
+        <div className="p-3 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gray-50 dark:bg-gh-darkCard flex items-start gap-2.5">
           {monitoredUsername ? (
             <>
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
-              <div className="flex-1 text-sm">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+              <div className="flex-1 text-xs">
                 <p className="font-semibold text-gh-lightText dark:text-gh-darkText">
                   {isAuthenticated ? 'Owner Account Active' : 'Public Profile Monitored'}
                 </p>
-                <p className="text-gh-lightMuted dark:text-gh-darkMuted text-xs mt-0.5">
+                <p className="text-gh-lightMuted dark:text-gh-darkMuted text-[11px] mt-0.5">
                   Currently viewing <span className="text-emerald-500 font-mono font-semibold">@{monitoredUsername}</span>.
                 </p>
               </div>
               <button
                 onClick={handleClearAccount}
-                className="px-2.5 py-1 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors flex items-center gap-1 shrink-0"
+                className="px-2 py-0.5 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-md transition-all duration-150 flex items-center gap-1 shrink-0"
               >
-                <LogOut className="w-3.5 h-3.5" /> Clear
+                <LogOut className="w-3 h-3" /> Clear
               </button>
             </>
           ) : (
             <>
-              <ShieldCheck className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
-              <div className="text-sm">
+              <ShieldCheck className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+              <div className="text-xs">
                 <p className="font-semibold text-gh-lightText dark:text-gh-darkText">No GitHub Account Selected</p>
-                <p className="text-gh-lightMuted dark:text-gh-darkMuted text-xs mt-0.5">
+                <p className="text-gh-lightMuted dark:text-gh-darkMuted text-[11px] mt-0.5">
                   Enter any public username below or connect your GitHub account.
                 </p>
               </div>
@@ -123,7 +123,7 @@ export default function ConnectGitHubModal() {
 
         {feedback && (
           <div
-            className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+            className={`p-2.5 rounded-md text-xs flex items-center gap-2 ${
               feedback.type === 'success'
                 ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                 : feedback.type === 'error'
@@ -131,38 +131,38 @@ export default function ConnectGitHubModal() {
                 : 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800'
             }`}
           >
-            <Sparkles className="w-4 h-4 shrink-0" />
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
             <span>{feedback.message}</span>
           </div>
         )}
 
         {/* Tab selection */}
-        <div className="flex rounded-xl bg-gray-100 dark:bg-gh-darkCard p-1 text-xs font-medium">
+        <div className="flex rounded-md bg-gray-100 dark:bg-gh-darkCard p-0.5 text-xs font-medium border border-gh-lightBorder dark:border-gh-darkBorder">
           <button
             onClick={() => setActiveTab('public')}
-            className={`flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-1 rounded transition-all duration-150 flex items-center justify-center gap-1.5 ${
               activeTab === 'public'
-                ? 'bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText shadow-sm'
+                ? 'bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText shadow-sm font-semibold'
                 : 'text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText dark:hover:text-gh-darkText'
             }`}
           >
-            <UserCheck className="w-3.5 h-3.5" /> Public Monitor
+            <UserCheck className="w-3.5 h-3.5" /> Public
           </button>
           <button
             onClick={() => setActiveTab('oauth')}
-            className={`flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-1 rounded transition-all duration-150 flex items-center justify-center gap-1.5 ${
               activeTab === 'oauth'
-                ? 'bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText shadow-sm'
+                ? 'bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText shadow-sm font-semibold'
                 : 'text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText dark:hover:text-gh-darkText'
             }`}
           >
-            <Github className="w-3.5 h-3.5" /> Connect OAuth
+            <Github className="w-3.5 h-3.5" /> OAuth
           </button>
           <button
             onClick={() => setActiveTab('pat')}
-            className={`flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-1 rounded transition-all duration-150 flex items-center justify-center gap-1.5 ${
               activeTab === 'pat'
-                ? 'bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText shadow-sm'
+                ? 'bg-white dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText shadow-sm font-semibold'
                 : 'text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText dark:hover:text-gh-darkText'
             }`}
           >
@@ -172,64 +172,64 @@ export default function ConnectGitHubModal() {
 
         {/* Tab content */}
         {activeTab === 'public' && (
-          <form onSubmit={handlePublicLookup} className="space-y-4">
+          <form onSubmit={handlePublicLookup} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-gh-lightMuted dark:text-gh-darkMuted mb-1.5">
+              <label className="block text-xs font-medium text-gh-lightMuted dark:text-gh-darkMuted mb-1">
                 GitHub Username to Monitor
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-gh-lightMuted dark:text-gh-darkMuted text-sm font-mono">@</span>
+                <span className="absolute left-2.5 top-2 text-gh-lightMuted dark:text-gh-darkMuted text-xs font-mono">@</span>
                 <input
                   type="text"
                   value={inputUsername}
                   onChange={(e) => setInputUsername(e.target.value)}
                   placeholder="e.g. gopiprakan, torvalds, gaearon..."
-                  className="w-full pl-8 pr-4 py-2 text-sm rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                  className="w-full pl-7 pr-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
                 />
               </div>
             </div>
             <button
               type="submit"
-              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-colors"
+              className="w-full py-2 px-3.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all duration-150"
             >
-              Monitor Account <ArrowRight className="w-4 h-4" />
+              <span>Monitor Account</span> <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </form>
         )}
 
         {activeTab === 'oauth' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted leading-relaxed">
               Authenticate your GitHub account. Your public coding stats, repositories, and commits will automatically sync for all visitors.
             </p>
             <div>
-              <label className="block text-xs font-medium text-gh-lightMuted dark:text-gh-darkMuted mb-1.5">
+              <label className="block text-xs font-medium text-gh-lightMuted dark:text-gh-darkMuted mb-1">
                 Your GitHub Username
               </label>
-              <div className="relative mb-3">
-                <span className="absolute left-3 top-2.5 text-gh-lightMuted dark:text-gh-darkMuted text-sm font-mono">@</span>
+              <div className="relative mb-2">
+                <span className="absolute left-2.5 top-2 text-gh-lightMuted dark:text-gh-darkMuted text-xs font-mono">@</span>
                 <input
                   type="text"
                   value={inputUsername}
                   onChange={(e) => setInputUsername(e.target.value)}
                   placeholder="your-github-username"
-                  className="w-full pl-8 pr-4 py-2 text-sm rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                  className="w-full pl-7 pr-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
                 />
               </div>
             </div>
             <button
               onClick={handleOAuthConnect}
-              className="w-full py-2.5 px-4 rounded-xl bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-all"
+              className="w-full py-2 px-3.5 rounded-md bg-gray-900 hover:bg-black dark:bg-white dark:hover:bg-gray-100 text-white dark:text-gray-900 font-medium text-xs flex items-center justify-center gap-2 shadow-sm transition-all duration-150"
             >
-              <Github className="w-4 h-4" />
+              <Github className="w-3.5 h-3.5" />
               <span>Connect with GitHub</span>
             </button>
           </div>
         )}
 
         {activeTab === 'pat' && (
-          <form onSubmit={handlePATConnect} className="space-y-4">
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 space-y-1.5">
+          <form onSubmit={handlePATConnect} className="space-y-3">
+            <div className="p-2.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-800 dark:text-emerald-300 space-y-1">
               <p className="font-semibold flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" /> Full GitHub Read & Write Sync
               </p>
@@ -240,9 +240,9 @@ export default function ConnectGitHubModal() {
                 href="https://github.com/settings/tokens/new?scopes=repo,read:user&description=CommitStreak-Editor"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:underline pt-0.5"
+                className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400 hover:underline pt-0.5 text-[11px]"
               >
-                <span>Generate Token on GitHub (pre-selected scopes)</span>
+                <span>Generate Token on GitHub</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
@@ -256,7 +256,7 @@ export default function ConnectGitHubModal() {
                 value={inputUsername}
                 onChange={(e) => setInputUsername(e.target.value)}
                 placeholder="your-github-username"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 mb-3 font-mono"
+                className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 mb-2 font-mono transition-all duration-150"
               />
               <label className="block text-xs font-medium text-gh-lightMuted dark:text-gh-darkMuted mb-1">
                 Personal Access Token (PAT)
@@ -266,14 +266,14 @@ export default function ConnectGitHubModal() {
                 value={personalToken}
                 onChange={(e) => setPersonalToken(e.target.value)}
                 placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
               />
             </div>
             <button
               type="submit"
-              className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-sm transition-colors"
+              className="w-full py-2 px-3.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all duration-150"
             >
-              Save Token & Connect <Key className="w-4 h-4" />
+              <span>Save Token & Connect</span> <Key className="w-3.5 h-3.5" />
             </button>
           </form>
         )}

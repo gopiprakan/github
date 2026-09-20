@@ -3,14 +3,14 @@ import { BookOpen, Flame, Sparkles, Plus, Code2 } from 'lucide-react';
 
 export default function JournalStats({ totalEntries = 0, streakDays = 0, onNewEntry }) {
   return (
-    <div className="rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 shadow-sm mb-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="rounded-lg border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-5 sm:p-6 shadow-sm hover:shadow-subtle transition-all duration-200 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
-              <BookOpen className="w-5 h-5" />
+            <span className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-500">
+              <BookOpen className="w-4 h-4" />
             </span>
-            <h2 className="text-xl font-bold text-gh-lightText dark:text-gh-darkText">
+            <h2 className="text-lg sm:text-xl font-bold text-gh-lightText dark:text-gh-darkText">
               Daily Coding Journal
             </h2>
           </div>
@@ -20,8 +20,8 @@ export default function JournalStats({ totalEntries = 0, streakDays = 0, onNewEn
         </div>
 
         {/* Action Button & Metrics */}
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-4 py-1.5 px-3.5 rounded-xl bg-gray-50 dark:bg-gh-darkCard border border-gh-lightBorder dark:border-gh-darkBorder text-xs">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-3.5 py-1.5 px-3 rounded-md bg-gray-50 dark:bg-gh-darkCard border border-gh-lightBorder dark:border-gh-darkBorder text-xs">
             <div>
               <span className="text-[10px] uppercase font-semibold text-gh-lightMuted dark:text-gh-darkMuted block">Logged Sessions</span>
               <span className="text-sm font-mono font-bold text-gh-lightText dark:text-gh-darkText">{totalEntries}</span>
@@ -38,7 +38,7 @@ export default function JournalStats({ totalEntries = 0, streakDays = 0, onNewEn
 
           <button
             onClick={onNewEntry}
-            className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition-all"
+            className="px-3.5 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs flex items-center gap-1.5 shadow-sm transition-all duration-150"
           >
             <Plus className="w-4 h-4" />
             <span>Log Coding Session</span>

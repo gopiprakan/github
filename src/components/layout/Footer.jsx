@@ -1,32 +1,32 @@
 import React from 'react';
-import { Flame, Github, Heart, Shield, Code2, ExternalLink } from 'lucide-react';
+import { Flame, Github, Shield, Code2, ExternalLink } from 'lucide-react';
 import Badge from '../common/Badge';
 
 export default function Footer({ onNavigate }) {
   return (
-    <footer className="border-t border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightPanel dark:bg-gh-darkPanel/60 text-gh-lightMuted dark:text-gh-darkMuted transition-colors py-12">
+    <footer className="border-t border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightPanel dark:bg-gh-darkPanel/60 text-gh-lightMuted dark:text-gh-darkMuted transition-colors duration-200 py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-gh-lightBorder dark:border-gh-darkBorder">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-gh-lightBorder dark:border-gh-darkBorder">
           {/* Col 1: Brand */}
           <div className="md:col-span-2 space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white">
-                <Flame className="w-4 h-4 fill-white" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md bg-emerald-500 flex items-center justify-center text-white shadow-sm">
+                <Flame className="w-3.5 h-3.5 fill-white" />
               </div>
-              <span className="font-bold text-base text-gh-lightText dark:text-gh-darkText tracking-tight">
+              <span className="font-bold text-sm text-gh-lightText dark:text-gh-darkText tracking-tight">
                 Commit<span className="text-emerald-500">Streak</span>
               </span>
-              <Badge variant="emerald" size="xs">v1.0 Vercel Ready</Badge>
+              <Badge variant="emerald" size="xs">v1.0 Live</Badge>
             </div>
             <p className="text-xs max-w-md leading-relaxed">
               Code every day. Track your progress. Build your future. A developer activity monitor and transparent public portfolio built for consistency.
             </p>
             <div className="flex items-center gap-4 pt-1 text-xs">
-              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-mono">
-                <Shield className="w-3.5 h-3.5" /> Read-only Public Visitor Mode
+              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-mono text-[11px]">
+                <Shield className="w-3 h-3" /> Read-only Public Visitor Mode
               </span>
-              <span className="flex items-center gap-1.5 font-mono">
-                <Code2 className="w-3.5 h-3.5" /> Open Ecosystem
+              <span className="flex items-center gap-1 font-mono text-[11px]">
+                <Code2 className="w-3 h-3" /> Open Ecosystem
               </span>
             </div>
           </div>
@@ -40,7 +40,7 @@ export default function Footer({ onNavigate }) {
               <li>
                 <button
                   onClick={() => onNavigate?.('home')}
-                  className="hover:text-emerald-500 transition-colors"
+                  className="hover:text-emerald-500 transition-colors duration-150"
                 >
                   Overview & Landing
                 </button>
@@ -48,7 +48,7 @@ export default function Footer({ onNavigate }) {
               <li>
                 <button
                   onClick={() => onNavigate?.('dashboard')}
-                  className="hover:text-emerald-500 transition-colors"
+                  className="hover:text-emerald-500 transition-colors duration-150"
                 >
                   Activity Dashboard
                 </button>
@@ -56,7 +56,7 @@ export default function Footer({ onNavigate }) {
               <li>
                 <button
                   onClick={() => onNavigate?.('journal')}
-                  className="hover:text-emerald-500 transition-colors"
+                  className="hover:text-emerald-500 transition-colors duration-150"
                 >
                   Daily Coding Journal
                 </button>
@@ -64,7 +64,7 @@ export default function Footer({ onNavigate }) {
               <li>
                 <button
                   onClick={() => onNavigate?.('repositories')}
-                  className="hover:text-emerald-500 transition-colors"
+                  className="hover:text-emerald-500 transition-colors duration-150"
                 >
                   Repository Explorer
                 </button>
@@ -92,7 +92,7 @@ export default function Footer({ onNavigate }) {
                   href="https://github.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-gh-lightText dark:text-gh-darkText hover:text-emerald-500 transition-colors"
+                  className="inline-flex items-center gap-1 text-gh-lightText dark:text-gh-darkText hover:text-emerald-500 transition-colors duration-150"
                 >
                   <Github className="w-3.5 h-3.5" /> GitHub REST & OAuth
                 </a>
@@ -102,7 +102,7 @@ export default function Footer({ onNavigate }) {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs gap-3">
+        <div className="pt-5 flex flex-col sm:flex-row items-center justify-between text-xs gap-3">
           <p>© {new Date().getFullYear()} CommitStreak. Built for developers committed to continuous improvement.</p>
           <div className="flex items-center gap-2">
             <span>Crafted with precision</span>

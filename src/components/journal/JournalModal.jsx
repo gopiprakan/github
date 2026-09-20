@@ -68,7 +68,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
       title={editingEntry ? 'Edit Coding Journal Entry' : 'Log Today\'s Coding Session'}
       maxWidth="max-w-2xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Row 1: Date & Repository */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
@@ -82,7 +82,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
               value={formData.date}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-150"
             />
           </div>
 
@@ -97,7 +97,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
               placeholder="e.g. cloud-pulse-engine"
               value={formData.repoName}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
             />
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
             value={formData.topic}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-150"
           />
         </div>
 
@@ -131,7 +131,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
             placeholder="What technical bug, obstacle, or architectural challenge did you solve?"
             value={formData.problemsSolved}
             onChange={handleChange}
-            className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+            className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-all duration-150"
           />
         </div>
 
@@ -147,7 +147,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
             placeholder="e.g. Rust, Concurrency, Atomic, Docker"
             value={formData.technologies}
             onChange={handleChange}
-            className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
           />
         </div>
 
@@ -163,7 +163,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
             placeholder="Key insights, gotchas, or concepts discovered today..."
             value={formData.whatLearned}
             onChange={handleChange}
-            className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+            className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-all duration-150"
           />
         </div>
 
@@ -180,7 +180,7 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
               placeholder="e.g. feat: implement atomic CAS (3a91e5c)"
               value={formData.commitMessage}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 font-mono transition-all duration-150"
             />
           </div>
 
@@ -195,23 +195,23 @@ export default function JournalModal({ isOpen, onClose, onSave, editingEntry = n
               placeholder="e.g. Streak day 47! Great flow state today."
               value={formData.personalNotes}
               onChange={handleChange}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full px-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-150"
             />
           </div>
         </div>
 
         {/* Action buttons */}
-        <div className="pt-3 border-t border-gh-lightBorder dark:border-gh-darkBorder flex items-center justify-end gap-2.5">
+        <div className="pt-3 border-t border-gh-lightBorder dark:border-gh-darkBorder flex items-center justify-end gap-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard"
+            className="px-3.5 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-all duration-150"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-xs font-medium rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm"
+            className="px-3.5 py-1.5 text-xs font-medium rounded-md bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm transition-all duration-150"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
             {editingEntry ? 'Update Entry' : 'Publish Entry'}

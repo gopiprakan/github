@@ -1,12 +1,12 @@
 import React from 'react';
 
 export default function Badge({ children, variant = 'default', size = 'sm', className = '' }) {
-  const base = "inline-flex items-center font-medium rounded-full transition-colors";
+  const base = "inline-flex items-center font-medium rounded transition-all duration-150";
   
   const sizes = {
-    xs: "px-2 py-0.5 text-xs",
-    sm: "px-2.5 py-0.5 text-xs",
-    md: "px-3 py-1 text-sm",
+    xs: "px-1.5 py-0.5 text-[11px]",
+    sm: "px-2 py-0.5 text-xs",
+    md: "px-2.5 py-1 text-xs",
   };
 
   const variants = {

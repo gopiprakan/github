@@ -23,7 +23,7 @@ export default function CommitActivityChart({ weeklyData = [], monthlyData = [] 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="p-3 rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-lg text-xs font-mono">
+        <div className="p-2.5 rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel shadow-lg text-xs font-mono">
           <p className="font-semibold text-gh-lightText dark:text-gh-darkText mb-1">{label}</p>
           <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
             <span>Commits:</span>
@@ -42,10 +42,10 @@ export default function CommitActivityChart({ weeklyData = [], monthlyData = [] 
   };
 
   return (
-    <div className="rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 shadow-sm">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gh-lightBorder dark:border-gh-darkBorder mb-5">
+    <div className="rounded-lg border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-5 sm:p-6 shadow-sm hover:shadow-subtle transition-all duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3.5 border-b border-gh-lightBorder dark:border-gh-darkBorder mb-4">
         <div>
-          <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
+          <h3 className="text-sm sm:text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-emerald-500" />
             Commit Activity & Cadence
           </h3>
@@ -55,39 +55,39 @@ export default function CommitActivityChart({ weeklyData = [], monthlyData = [] 
         </div>
 
         {/* View toggle */}
-        <div className="flex rounded-xl bg-gray-100 dark:bg-gh-darkCard p-1 text-xs font-medium self-start sm:self-auto">
+        <div className="flex rounded-md bg-gray-100 dark:bg-gh-darkCard p-0.5 text-xs font-medium self-start sm:self-auto border border-gh-lightBorder dark:border-gh-darkBorder">
           <button
             onClick={() => setView('weekly')}
-            className={`px-3 py-1 rounded-lg transition-all ${
+            className={`px-2.5 py-1 rounded transition-all duration-150 ${
               view === 'weekly'
                 ? 'bg-white dark:bg-gh-darkPanel text-emerald-600 dark:text-emerald-400 shadow-sm font-semibold'
                 : 'text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText dark:hover:text-gh-darkText'
             }`}
           >
-            Weekly Cadence
+            Weekly
           </button>
           <button
             onClick={() => setView('monthly')}
-            className={`px-3 py-1 rounded-lg transition-all ${
+            className={`px-2.5 py-1 rounded transition-all duration-150 ${
               view === 'monthly'
                 ? 'bg-white dark:bg-gh-darkPanel text-emerald-600 dark:text-emerald-400 shadow-sm font-semibold'
                 : 'text-gh-lightMuted dark:text-gh-darkMuted hover:text-gh-lightText dark:hover:text-gh-darkText'
             }`}
           >
-            Monthly Trend
+            Monthly
           </button>
         </div>
       </div>
 
-      <div className="h-64 w-full">
+      <div className="h-60 w-full">
         {view === 'weekly' ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-              <XAxis dataKey="day" stroke={textColor} fontSize={12} tickLine={false} />
-              <YAxis stroke={textColor} fontSize={12} tickLine={false} />
+              <XAxis dataKey="day" stroke={textColor} fontSize={11} tickLine={false} />
+              <YAxis stroke={textColor} fontSize={11} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="commits" name="Commits" fill="#22c55e" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="commits" name="Commits" fill="#22c55e" radius={[2, 2, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -95,13 +95,13 @@ export default function CommitActivityChart({ weeklyData = [], monthlyData = [] 
             <AreaChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="commitGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.4} />
+                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
                   <stop offset="95%" stopColor="#22c55e" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-              <XAxis dataKey="month" stroke={textColor} fontSize={12} tickLine={false} />
-              <YAxis stroke={textColor} fontSize={12} tickLine={false} />
+              <XAxis dataKey="month" stroke={textColor} fontSize={11} tickLine={false} />
+              <YAxis stroke={textColor} fontSize={11} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
@@ -118,8 +118,8 @@ export default function CommitActivityChart({ weeklyData = [], monthlyData = [] 
       </div>
 
       <div className="mt-3 pt-3 border-t border-gh-lightBorder dark:border-gh-darkBorder flex items-center justify-between text-[11px] text-gh-lightMuted dark:text-gh-darkMuted">
-        <span>Highest concentration: Wednesday (mid-week release cycle)</span>
-        <span className="font-mono text-emerald-500">Peak: 182 commits/mo</span>
+        <span>Regular commit cadence tracked</span>
+        <span className="font-mono text-emerald-500">Live Metric</span>
       </div>
     </div>
   );

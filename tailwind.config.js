@@ -42,14 +42,29 @@ export default {
           700: '#15803d',
         }
       },
+      borderRadius: {
+        'none': '0px',
+        'sm': '2px',
+        DEFAULT: '4px',
+        'md': '6px',
+        'lg': '6px',
+        'xl': '6px',
+        '2xl': '8px',
+        '3xl': '8px',
+        'full': '9999px',
+      },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
-        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
-        'elevated': '0 4px 20px -2px rgba(0, 0, 0, 0.15)',
-        'elevated-dark': '0 8px 30px rgba(0, 0, 0, 0.4)',
+        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
+        'elevated': '0 4px 16px -2px rgba(0, 0, 0, 0.08)',
+        'elevated-dark': '0 8px 24px rgba(0, 0, 0, 0.35)',
+        'glow-emerald': '0 0 16px -2px rgba(34, 197, 94, 0.25)',
+      },
+      transitionTimingFunction: {
+        'smooth': 'cubic-bezier(0.16, 1, 0.3, 1)',
       }
     },
   },

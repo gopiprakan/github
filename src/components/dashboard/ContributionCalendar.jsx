@@ -72,12 +72,12 @@ export default function ContributionCalendar({ contributions = [] }) {
   };
 
   return (
-    <div className="rounded-2xl border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-6 shadow-sm">
+    <div className="rounded-lg border border-gh-lightBorder dark:border-gh-darkBorder bg-white dark:bg-gh-darkPanel p-5 sm:p-6 shadow-sm hover:shadow-subtle transition-all duration-200">
       {/* Calendar header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-gh-lightBorder dark:border-gh-darkBorder mb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gh-lightBorder dark:border-gh-darkBorder mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-semibold text-gh-lightText dark:text-gh-darkText flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-emerald-500" />
               Contributions Calendar
             </h3>
@@ -86,16 +86,16 @@ export default function ContributionCalendar({ contributions = [] }) {
             </span>
           </div>
           <p className="text-xs text-gh-lightMuted dark:text-gh-darkMuted mt-0.5">
-            Real-time activity mapping across all tracked public commits and branches
+            Activity mapping across all tracked public commits and branches
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {['Past Year', '2026', '2025'].map((year) => (
             <button
               key={year}
               onClick={() => setSelectedYear(year)}
-              className={`px-3 py-1 text-xs font-medium rounded-lg transition-colors ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-150 ${
                 selectedYear === year
                   ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                   : 'text-gh-lightMuted dark:text-gh-darkMuted hover:bg-gray-100 dark:hover:bg-gh-darkCard'
@@ -108,8 +108,8 @@ export default function ContributionCalendar({ contributions = [] }) {
       </div>
 
       {/* Heatmap grid container */}
-      <div className="relative overflow-x-auto pb-3 pt-1">
-        <div className="min-w-[780px]">
+      <div className="relative overflow-x-auto pb-2 pt-1">
+        <div className="min-w-[760px]">
           {/* Month labels */}
           <div className="flex text-[10px] font-mono text-gh-lightMuted dark:text-gh-darkMuted mb-2 pl-7 relative h-4">
             {monthLabels.map((m, idx) => (
@@ -142,7 +142,7 @@ export default function ContributionCalendar({ contributions = [] }) {
                       onMouseLeave={() => setHoveredCell(null)}
                       onClick={() => setHoveredCell(day)}
                       aria-label={`${day.count || 0} contributions on ${day.date}`}
-                      className={`w-[11px] h-[11px] rounded-[2px] border transition-transform hover:scale-125 focus:outline-none focus:ring-1 focus:ring-emerald-400 ${getCellColor(
+                      className={`w-[11px] h-[11px] rounded-[2px] border transition-transform duration-100 hover:scale-125 focus:outline-none focus:ring-1 focus:ring-emerald-400 ${getCellColor(
                         day.level
                       )}`}
                     />
@@ -155,7 +155,7 @@ export default function ContributionCalendar({ contributions = [] }) {
       </div>
 
       {/* Footer info: Legend & Hover Details */}
-      <div className="mt-4 pt-4 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+      <div className="mt-3.5 pt-3.5 border-t border-gh-lightBorder dark:border-gh-darkBorder flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         {/* Tooltip detail bar */}
         <div className="h-5 flex items-center gap-2 text-gh-lightText dark:text-gh-darkText font-mono text-[11px]">
           {hoveredCell ? (

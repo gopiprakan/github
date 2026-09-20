@@ -73,23 +73,23 @@ export default function CreateRepoModal({ isOpen, onClose, onRepoCreated }) {
       title="Create New GitHub Repository"
       maxWidth="max-w-lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         {!ownerToken ? (
-          <div className="p-3.5 rounded-xl border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+          <div className="p-3 rounded-md border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
               <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
-              <span>Token required: Connect a GitHub PAT with <code className="font-mono font-bold">repo</code> scope to create repos.</span>
+              <span>Token required: Connect a PAT with <code className="font-mono font-bold">repo</code> scope to create repos.</span>
             </div>
             <button
               type="button"
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium flex items-center gap-1 shrink-0 text-xs"
+              className="px-2.5 py-1 rounded-md bg-amber-600 hover:bg-amber-700 text-white font-medium flex items-center gap-1 shrink-0 text-xs transition-all duration-150"
             >
               <Key className="w-3 h-3" /> Connect Token
             </button>
           </div>
         ) : (
-          <div className="p-2.5 rounded-xl border border-emerald-300 dark:border-emerald-800/80 bg-emerald-50 dark:bg-emerald-950/30 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
+          <div className="p-2.5 rounded-md border border-emerald-300 dark:border-emerald-800/80 bg-emerald-50 dark:bg-emerald-950/30 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
             <span>
               Creating repository on GitHub account <strong className="font-mono">@{monitoredUsername}</strong>.
@@ -99,7 +99,7 @@ export default function CreateRepoModal({ isOpen, onClose, onRepoCreated }) {
 
         {feedback && (
           <div
-            className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 ${
+            className={`p-2.5 rounded-md text-xs flex items-center justify-between gap-2 ${
               feedback.type === 'success'
                 ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
                 : 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border border-red-300 dark:border-red-800'
@@ -128,31 +128,31 @@ export default function CreateRepoModal({ isOpen, onClose, onRepoCreated }) {
 
         {/* Repository Name */}
         <div>
-          <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">
+          <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1">
             Repository Name <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-2.5 text-xs font-mono text-gh-lightMuted dark:text-gh-darkMuted">
+            <span className="absolute left-2.5 top-2 text-xs font-mono text-gh-lightMuted dark:text-gh-darkMuted">
               {monitoredUsername ? `${monitoredUsername}/` : 'repo/'}
             </span>
             <input
               type="text"
-              placeholder="e.g. awesome-project"
+              placeholder="awesome-project"
               value={repoName}
               onChange={(e) => setRepoName(e.target.value.toLowerCase().replace(/[^a-z0-9-_.]/g, '-'))}
               required
-              style={{ paddingLeft: `${(monitoredUsername ? monitoredUsername.length : 4) * 8 + 24}px` }}
-              className="w-full pr-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              style={{ paddingLeft: `${(monitoredUsername ? monitoredUsername.length : 4) * 7.5 + 20}px` }}
+              className="w-full pr-3 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText font-mono focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-150"
             />
           </div>
-          <p className="text-[11px] text-gh-lightMuted dark:text-gh-darkMuted mt-1">
-            Great repository names are short and memorable.
+          <p className="text-[10px] text-gh-lightMuted dark:text-gh-darkMuted mt-1">
+            Short, memorable repository name.
           </p>
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">
+          <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1">
             Description <span className="text-gh-lightMuted dark:text-gh-darkMuted font-normal">(optional)</span>
           </label>
           <textarea
@@ -160,46 +160,46 @@ export default function CreateRepoModal({ isOpen, onClose, onRepoCreated }) {
             placeholder="Short description of your project..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full px-3 py-2 text-xs rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+            className="w-full px-2.5 py-1.5 text-xs rounded-md border border-gh-lightBorder dark:border-gh-darkBorder bg-gh-lightBg dark:bg-gh-darkPanel text-gh-lightText dark:text-gh-darkText focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none transition-all duration-150"
           />
         </div>
 
         {/* Visibility */}
         <div>
-          <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-2">
+          <label className="block text-xs font-semibold text-gh-lightText dark:text-gh-darkText mb-1.5">
             Visibility
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
               onClick={() => setIsPrivate(false)}
-              className={`p-3 rounded-xl border text-left text-xs transition-all ${
+              className={`p-2.5 rounded-md border text-left text-xs transition-all duration-150 ${
                 !isPrivate
                   ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-500'
                   : 'border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightMuted hover:bg-gray-50 dark:hover:bg-gh-darkCard'
               }`}
             >
               <span className="font-semibold block text-gh-lightText dark:text-gh-darkText">Public</span>
-              <span className="text-[10px] text-gh-lightMuted dark:text-gh-darkMuted">Anyone on the internet can see this repository.</span>
+              <span className="text-[10px] text-gh-lightMuted dark:text-gh-darkMuted">Anyone on the internet can see this repo.</span>
             </button>
 
             <button
               type="button"
               onClick={() => setIsPrivate(true)}
-              className={`p-3 rounded-xl border text-left text-xs transition-all ${
+              className={`p-2.5 rounded-md border text-left text-xs transition-all duration-150 ${
                 isPrivate
                   ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 ring-1 ring-emerald-500'
                   : 'border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightMuted hover:bg-gray-50 dark:hover:bg-gh-darkCard'
               }`}
             >
               <span className="font-semibold block text-gh-lightText dark:text-gh-darkText">Private</span>
-              <span className="text-[10px] text-gh-lightMuted dark:text-gh-darkMuted">You choose who can see and commit to this repository.</span>
+              <span className="text-[10px] text-gh-lightMuted dark:text-gh-darkMuted">You choose who can see and commit.</span>
             </button>
           </div>
         </div>
 
         {/* Initialize with README */}
-        <label className="flex items-center gap-2 text-xs text-gh-lightText dark:text-gh-darkText cursor-pointer pt-1">
+        <label className="flex items-center gap-2 text-xs text-gh-lightText dark:text-gh-darkText cursor-pointer pt-0.5">
           <input
             type="checkbox"
             checked={autoInit}
@@ -214,14 +214,14 @@ export default function CreateRepoModal({ isOpen, onClose, onRepoCreated }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium rounded-xl border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard"
+            className="px-3.5 py-1.5 text-xs font-medium rounded-md border border-gh-lightBorder dark:border-gh-darkBorder text-gh-lightText dark:text-gh-darkText hover:bg-gray-50 dark:hover:bg-gh-darkCard transition-all duration-150"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting || !repoName.trim()}
-            className={`px-4 py-2 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors ${
+            className={`px-3.5 py-1.5 text-xs font-semibold rounded-md flex items-center gap-1.5 transition-all duration-150 ${
               repoName.trim() && !isSubmitting
                 ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'
                 : 'bg-gray-200 dark:bg-gh-darkCard text-gh-lightMuted cursor-not-allowed opacity-60'
