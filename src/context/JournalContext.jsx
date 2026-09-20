@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { INITIAL_JOURNAL_ENTRIES } from '../services/mockData';
 
 const JournalContext = createContext();
 
@@ -8,12 +9,12 @@ export function JournalProvider({ children }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch (e) {
         console.error('Failed to parse saved journal entries:', e);
       }
     }
-    return [];
+    return INITIAL_JOURNAL_ENTRIES;
   });
 
   const [selectedTag, setSelectedTag] = useState('All');
