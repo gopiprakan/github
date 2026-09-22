@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { JournalProvider } from './context/JournalContext';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
