@@ -12,6 +12,53 @@ import ConnectGitHubModal from './components/auth/ConnectGitHubModal';
 
 function MainApp() {
   const [activePage, setActivePage] = useState('home');
+  const { monitoredUsername } = useAuth();
+
+  // Dynamic SEO Page Title & Meta description update
+  React.useEffect(() => {
+    let title = 'CommitStreak — Daily GitHub Coding Streak Monitor & Developer Portfolio';
+    let description = 'Track your daily GitHub coding streaks, analyze commit habits, inspect language analytics, showcase repositories, and document your engineering journey with CommitStreak.';
+
+    switch (activePage) {
+      case 'dashboard':
+        title = monitoredUsername 
+          ? `@${monitoredUsername}'s GitHub Streak & Activity Dashboard | CommitStreak` 
+          : 'GitHub Activity Dashboard & Analytics | CommitStreak';
+        description = `Inspect real-time GitHub commit velocity, streak heatmap, and programming language statistics for ${monitoredUsername || 'developers'}.`;
+        break;
+      case 'repositories':
+        title = monitoredUsername
+          ? `@${monitoredUsername}'s Top Repositories & Portfolio | CommitStreak`
+          : 'GitHub Repositories & Portfolio Showcase | CommitStreak';
+        description = `Browse starred, active, and featured open-source repositories and tech stack metrics for ${monitoredUsername || 'developers'}.`;
+        break;
+      case 'journal':
+        title = 'Daily Engineering Dev Journal & Notes | CommitStreak';
+        description = 'Maintain daily developer logs, track engineering milestones, and document coding achievements.';
+        break;
+      case 'home':
+      default:
+        title = 'CommitStreak — Daily GitHub Coding Streak Monitor & Developer Portfolio';
+        description = 'Track your daily GitHub coding streaks, analyze commit habits, showcase repositories, and document your engineering journey with CommitStreak.';
+        break;
+    }
+
+    document.title = title;
+
+    // Update meta description tag dynamically
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) {
+      metaDesc.setAttribute('content', description);
+    }
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+      ogTitle.setAttribute('content', title);
+    }
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) {
+      ogDesc.setAttribute('content', description);
+    }
+  }, [activePage, monitoredUsername]);
 
   const renderContent = () => {
     switch (activePage) {
