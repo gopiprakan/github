@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="50%" stop-color="#161b22"/>
+      <stop offset="100%" stop-color="#090d13"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="50%" stop-color="#14b8a6"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="30" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle decorative grid -->
+  <g opacity="0.08" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="105" x2="1200" y2="105" />
+    <line x1="0" y1="210" x2="1200" y2="210" />
+    <line x1="0" y1="315" x2="1200" y2="315" />
+    <line x1="0" y1="420" x2="1200" y2="420" />
+    <line x1="0" y1="525" x2="1200" y2="525" />
+    <line x1="150" y1="0" x2="150" y2="630" />
+    <line x1="300" y1="0" x2="300" y2="630" />
+    <line x1="450" y1="0" x2="450" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="750" y1="0" x2="750" y2="630" />
+    <line x1="900" y1="0" x2="900" y2="630" />
+    <line x1="1050" y1="0" x2="1050" y2="630" />
+  </g>
+
+  <!-- Glowing accent orb -->
+  <circle cx="1000" cy="180" r="180" fill="#10b981" opacity="0.12" filter="url(#glow)" />
+  <circle cx="200" cy="500" r="140" fill="#14b8a6" opacity="0.08" filter="url(#glow)" />
+
+  <!-- Container Border -->
+  <rect x="24" y="24" width="1152" height="582" rx="20" fill="none" stroke="#30363d" stroke-width="2" opacity="0.7"/>
+
+  <!-- Logo Mark -->
+  <g transform="translate(100, 100)">
+    <rect width="64" height="64" rx="16" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+    <path d="M16 46L30 32M30 32L44 18" stroke="#10b981" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="16" cy="46" r="5" fill="#0d1117" stroke="#10b981" stroke-width="3.5"/>
+    <circle cx="30" cy="32" r="5" fill="#0d1117" stroke="#10b981" stroke-width="3.5"/>
+    <path d="M36 18H48V30" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="48" cy="18" r="4" fill="#34d399"/>
+  </g>
+
+  <!-- Brand Name -->
+  <text x="180" y="142" fill="#ffffff" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="800" letter-spacing="-0.5">CommitStreak</text>
+  <rect x="420" y="118" width="105" height="28" rx="6" fill="#164e63" stroke="#0891b2" stroke-width="1"/>
+  <text x="432" y="137" fill="#38bdf8" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700">PRO MONITOR</text>
+
+  <!-- Hero Headline -->
+  <text x="100" y="260" fill="#f0f6fc" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="800" letter-spacing="-1">
+    Daily GitHub Coding Monitor
+  </text>
+  <text x="100" y="325" fill="url(#accentGrad)" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="800" letter-spacing="-1">
+    &amp; Developer Portfolio
+  </text>
+
+  <!-- Subtitle -->
+  <text x="100" y="390" fill="#8b949e" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="400">
+    Track daily streaks • Analyze commit velocity • Showcase repos • Daily dev journal
+  </text>
+
+  <!-- Feature Pills -->
+  <g transform="translate(100, 450)">
+    <!-- Pill 1 -->
+    <rect x="0" y="0" width="230" height="52" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+    <circle cx="28" cy="26" r="7" fill="#10b981"/>
+    <text x="46" y="32" fill="#e6edf3" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">Streak Heatmap</text>
+
+    <!-- Pill 2 -->
+    <rect x="250" y="0" width="240" height="52" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+    <circle cx="278" cy="26" r="7" fill="#06b6d4"/>
+    <text x="296" y="32" fill="#e6edf3" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">Language Analytics</text>
+
+    <!-- Pill 3 -->
+    <rect x="510" y="0" width="230" height="52" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+    <circle cx="538" cy="26" r="7" fill="#f59e0b"/>
+    <text x="556" y="32" fill="#e6edf3" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">Daily Dev Journal</text>
+
+    <!-- Pill 4 -->
+    <rect x="760" y="0" width="220" height="52" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1.5"/>
+    <circle cx="788" cy="26" r="7" fill="#a855f7"/>
+    <text x="806" y="32" fill="#e6edf3" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="600">Zero Auth Search</text>
+  </g>
+
+  <!-- URL Tag -->
+  <text x="100" y="555" fill="#6e7681" font-family="monospace" font-size="16">commitstreak.vercel.app</text>
+</svg>
