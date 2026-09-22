@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://commitstreak.vercel.app/sitemap.xml
